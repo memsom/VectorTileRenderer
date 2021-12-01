@@ -95,8 +95,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="VectorMbTilesProvider.cs" />
-    <Compile Include="VectorMbTilesSource.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -158,7 +156,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(SolutionDir)VectorTileRenderer\bin\Debug\x64\SQLite.Interop.dll"  "$(TargetDir)" /y</PostBuildEvent>
+    <PostBuildEvent>rem xcopy "$(SolutionDir)VectorTileRenderer\bin\Debug\x64\SQLite.Interop.dll"  "$(TargetDir)" /y</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.115.0\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
 </Project>

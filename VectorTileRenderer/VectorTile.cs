@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using Xamarin.Forms;
 
 namespace VectorTileRenderer
 {
@@ -15,15 +16,19 @@ namespace VectorTileRenderer
             
             foreach(var layer in Layers)
             {
-                var vectorLayer = new VectorTileLayer();
-                vectorLayer.Name = layer.Name;
+                var vectorLayer = new VectorTileLayer
+                {
+                    Name = layer.Name
+                };
 
                 foreach (var feature in layer.Features)
                 {
-                    var vectorFeature = new VectorTileFeature();
-                    vectorFeature.Attributes = new Dictionary<string, object>(feature.Attributes);
-                    vectorFeature.Extent = feature.Extent;
-                    vectorFeature.GeometryType = feature.GeometryType;
+                    var vectorFeature = new VectorTileFeature
+                    {
+                        Attributes = new Dictionary<string, object>(feature.Attributes),
+                        Extent = feature.Extent,
+                        GeometryType = feature.GeometryType
+                    };
 
                     var vectorGeometry = new List<List<Point>>();
                     foreach (var geometry in feature.Geometry)

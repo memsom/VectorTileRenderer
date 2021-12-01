@@ -2,13 +2,23 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Media;
+using Xamarin.Forms;
 
 namespace VectorTileRenderer
 {
+    public enum PenLineCap
+    {
+        Flat = 0,
+        Square = 1,
+        Round = 2,
+        Triangle = 3
+    }
+
+
     public class Brush
     {
         public int ZIndex { get; set; } = 0;
@@ -310,11 +320,11 @@ namespace VectorTileRenderer
 
             foreach (var brush in brushes)
             {
-                var newColor = Color.FromArgb((byte)Math.Max(0, Math.Min(255, brush.Paint.BackgroundOpacity * brush.Paint.BackgroundColor.A)), brush.Paint.BackgroundColor.R, brush.Paint.BackgroundColor.G, brush.Paint.BackgroundColor.B);
+                var newColor = Color.FromRgba(brush.Paint.BackgroundColor.R, brush.Paint.BackgroundColor.G, brush.Paint.BackgroundColor.B, (byte)Math.Max(0, Math.Min(255, brush.Paint.BackgroundOpacity * brush.Paint.BackgroundColor.A)));
                 return newColor;
             }
 
-            return Colors.White;
+            return Color.White;
         }
 
         //public Brush[] GetBrushesCached(double zoom, double scale, string type, string id, Dictionary<string, object> attributes)
@@ -380,10 +390,12 @@ namespace VectorTileRenderer
             var layoutData = layer.Layout;
             var index = layer.Index;
 
-            var brush = new Brush();
-            brush.ZIndex = index;
-            brush._layer = layer;
-            brush.GlyphsDirectory = this.FontDirectory;
+            var brush = new Brush
+            {
+                ZIndex = index,
+                _layer = layer,
+                GlyphsDirectory = this.FontDirectory
+            };
 
             var paint = new Paint();
             brush.Paint = paint;
@@ -399,22 +411,22 @@ namespace VectorTileRenderer
 
                 if (paintData.ContainsKey("fill-color"))
                 {
-                    paint.FillColor = parseColor(getValue(paintData["fill-color"], attributes));
+                    paint.FillColor = ParseColor(getValue(paintData["fill-color"], attributes));
                 }
 
                 if (paintData.ContainsKey("background-color"))
                 {
-                    paint.BackgroundColor = parseColor(getValue(paintData["background-color"], attributes));
+                    paint.BackgroundColor = ParseColor(getValue(paintData["background-color"], attributes));
                 }
 
                 if (paintData.ContainsKey("text-color"))
                 {
-                    paint.TextColor = parseColor(getValue(paintData["text-color"], attributes));
+                    paint.TextColor = ParseColor(getValue(paintData["text-color"], attributes));
                 }
 
                 if (paintData.ContainsKey("line-color"))
                 {
-                    paint.LineColor = parseColor(getValue(paintData["line-color"], attributes));
+                    paint.LineColor = ParseColor(getValue(paintData["line-color"], attributes));
                 }
 
                 // --
@@ -483,7 +495,7 @@ namespace VectorTileRenderer
 
                 if (paintData.ContainsKey("text-halo-color"))
                 {
-                    paint.TextStrokeColor = parseColor(getValue(paintData["text-halo-color"], attributes));
+                    paint.TextStrokeColor = ParseColor(getValue(paintData["text-halo-color"], attributes));
                 }
 
                 if (paintData.ContainsKey("text-halo-width"))
@@ -512,6 +524,9 @@ namespace VectorTileRenderer
                 if (layoutData.ContainsKey("line-cap"))
                 {
                     var value = (string)getValue(layoutData["line-cap"], attributes);
+
+                    // TODO - fix this
+
                     if (value == "butt")
                     {
                         paint.LineCap = PenLineCap.Flat;
@@ -538,7 +553,7 @@ namespace VectorTileRenderer
                     // TODO check performance implications of Regex.Replace
                     brush.Text = Regex.Replace(brush.TextField, @"\{([A-Za-z0-9\-\:_]+)\}", (Match m) =>
                     {
-                        var key = stripBraces(m.Value);
+                        var key = StripBraces(m.Value);
                         if (attributes.ContainsKey(key))
                         {
                             return attributes[key].ToString();
@@ -608,7 +623,7 @@ namespace VectorTileRenderer
             return brush;
         }
 
-        private unsafe string stripBraces(string s)
+        unsafe string StripBraces(string s)
         {
             int len = s.Length;
             char* newChars = stackalloc char[len];
@@ -630,8 +645,10 @@ namespace VectorTileRenderer
             return new string(newChars, 0, (int)(currentChar - newChars));
         }
 
-        private Color parseColor(object iColor)
+        private Color ParseColor(object iColor)
         {
+            var culture = new CultureInfo("en-US", true);
+
             if (iColor.GetType() == typeof(Color))
             {
                 return (Color)iColor;
@@ -646,15 +663,17 @@ namespace VectorTileRenderer
 
             if (colorString[0] == '#')
             {
-                return (Color)ColorConverter.ConvertFromString(colorString);
+                var color = KnownColors.ColorStringToKnownColor(colorString);
+                return Color.FromUint((uint)color);
             }
 
             if (colorString.StartsWith("hsl("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double h = double.Parse(segments[1]);
-                double s = double.Parse(segments[2]);
-                double l = double.Parse(segments[3]);
+                
+                double h = double.Parse(segments[1], culture);
+                double s = double.Parse(segments[2], culture);
+                double l = double.Parse(segments[3], culture);
 
                 var color = (new ColorMine.ColorSpaces.Hsl()
                 {
@@ -669,10 +688,10 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("hsla("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double h = double.Parse(segments[1]);
-                double s = double.Parse(segments[2]);
-                double l = double.Parse(segments[3]);
-                double a = double.Parse(segments[4]) * 255;
+                double h = double.Parse(segments[1], culture);
+                double s = double.Parse(segments[2], culture);
+                double l = double.Parse(segments[3], culture);
+                double a = double.Parse(segments[4], culture) * 255;
 
                 var color = (new ColorMine.ColorSpaces.Hsl()
                 {
@@ -681,39 +700,49 @@ namespace VectorTileRenderer
                     L = l,
                 }).ToRgb();
 
-                return Color.FromArgb((byte)(a), (byte)color.R, (byte)color.G, (byte)color.B);
+                return Color.FromRgba((byte)color.R, (byte)color.G, (byte)color.B, (byte)(a));
             }
 
             if (colorString.StartsWith("rgba("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double r = double.Parse(segments[1]);
-                double g = double.Parse(segments[2]);
-                double b = double.Parse(segments[3]);
-                double a = double.Parse(segments[4]) * 255;
+                double r = double.Parse(segments[1], culture);
+                double g = double.Parse(segments[2], culture);
+                double b = double.Parse(segments[3], culture);
+                double a = double.Parse(segments[4], culture) * 255;
 
-                return Color.FromArgb((byte)a, (byte)r, (byte)g, (byte)b);
+                return Color.FromRgba((byte)r, (byte)g, (byte)b, (byte)a);
             }
 
             if (colorString.StartsWith("rgb("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double r = double.Parse(segments[1]);
-                double g = double.Parse(segments[2]);
-                double b = double.Parse(segments[3]);
+                double r = double.Parse(segments[1], culture);
+                double g = double.Parse(segments[2], culture);
+                double b = double.Parse(segments[3], culture);
 
                 return Color.FromRgb((byte)r, (byte)g, (byte)b);
             }
 
             try
             {
-                return (Color)ColorConverter.ConvertFromString(colorString);
+                return (Color)ConvertFromString(colorString);
             }
             catch (Exception e)
             {
                 throw new NotImplementedException("Not implemented color format: " + colorString);
             }
             //return Colors.Violet;
+        }
+
+        public static object ConvertFromString(string value)
+        {
+            if (null == value)
+            {
+                return null;
+            }
+
+            return KnownColors.ParseColor(value);
         }
 
         public bool ValidateLayer(Layer layer, double zoom, Dictionary<string, object> attributes)

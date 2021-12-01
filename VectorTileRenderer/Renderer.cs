@@ -5,34 +5,14 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media.Imaging;
+using Xamarin.Forms;
 
 namespace VectorTileRenderer
 {
     public class Renderer
     {
         // TODO make it instance based... maybe
-        private static Object cacheLock = new Object();
-
-        enum VisualLayerType
-        {
-            Vector,
-            Raster,
-        }
-
-        class VisualLayer
-        {
-            public VisualLayerType Type { get; set; }
-
-            public Stream RasterStream { get; set; } = null;
-
-            public VectorTileFeature VectorTileFeature { get; set; } = null;
-
-            public List<List<Point>> Geometry { get; set; } = null;
-
-            public Brush Brush { get; set; } = null;
-        }
+        static object cacheLock = new object();
 
         public async static Task<BitmapSource> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
@@ -65,7 +45,7 @@ namespace VectorTileRenderer
             {
                 if (File.Exists(path))
                 {
-                    return loadBitmap(path);
+                    return LoadBitmap(path);
                 }
             }
 
@@ -88,8 +68,8 @@ namespace VectorTileRenderer
 
                               using (var fileStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))
                               {
-                                  BitmapEncoder encoder = new PngBitmapEncoder();
-                                  encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                                  BitmapEncoder encoder = new BitmapEncoder();
+                                  encoder.Add(BitmapFrame.Create(bitmap));
                                   encoder.Save(fileStream);
                               }
                           }
@@ -108,7 +88,7 @@ namespace VectorTileRenderer
             return bitmap;
         }
 
-        static BitmapSource loadBitmap(string path)
+        static BitmapSource LoadBitmap(string path)
         {
             using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
