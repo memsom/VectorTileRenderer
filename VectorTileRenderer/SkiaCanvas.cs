@@ -727,7 +727,6 @@ namespace VectorTileRenderer
             using (var data = image.Encode(SKEncodedImageFormat.Png, 80))
             using (var result = new MemoryStream())
             {
-
                 data.SaveTo(result);
                 return result.ToArray();
             }
