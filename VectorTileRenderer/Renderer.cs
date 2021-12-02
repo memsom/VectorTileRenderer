@@ -3,33 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace VectorTileRenderer
 {
     public class Renderer
     {
         // TODO make it instance based... maybe
-        private static Object cacheLock = new Object();
-
-        enum VisualLayerType
-        {
-            Vector,
-            Raster,
-        }
-
-        class VisualLayer
-        {
-            public VisualLayerType Type { get; set; }
-
-            public Stream RasterStream { get; set; } = null;
-
-            public VectorTileFeature VectorTileFeature { get; set; } = null;
-
-            public List<List<Point>> Geometry { get; set; } = null;
-
-            public Brush Brush { get; set; } = null;
-        }
+        static object cacheLock = new object();
 
         public async static Task<byte[]> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
@@ -182,7 +162,7 @@ namespace VectorTileRenderer
                                             for (int i = 0; i < geometry.Count; i++)
                                             {
                                                 var point = geometry[i];
-                                                geometry[i] = new Point(point.X / feature.Extent * sizeX, point.Y / feature.Extent * sizeY);
+                                                geometry[i] = new VTPoint(point.X / feature.Extent * sizeX, point.Y / feature.Extent * sizeY);
                                             }
                                         }
                                     }
@@ -405,13 +385,13 @@ namespace VectorTileRenderer
             return canvas.FinishDrawing();
         }
 
-        private static List<List<Point>> localizeGeometry(List<List<Point>> coordinates, double sizeX, double sizeY, double extent)
+        static List<List<VTPoint>> LocalizeGeometry(List<List<VTPoint>> coordinates, double sizeX, double sizeY, double extent)
         {
             return coordinates.Select(list =>
             {
                 return list.Select(point =>
                 {
-                    Point newPoint = new Point(0, 0);
+                    VTPoint newPoint = new VTPoint(0, 0);
 
                     var x = Utils.ConvertRange(point.X, 0, extent, 0, sizeX, false);
                     var y = Utils.ConvertRange(point.Y, 0, extent, 0, sizeY, false);

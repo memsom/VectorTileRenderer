@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
+using System.ComponentModel;
 
 namespace VectorTileRenderer
 {
@@ -8,35 +8,40 @@ namespace VectorTileRenderer
         public bool IsOverZoomed { get; set; } = false;
         public List<VectorTileLayer> Layers = new List<VectorTileLayer>();
 
-        public VectorTile ApplyExtent(Rect extent)
+        public VectorTile ApplyExtent(VTRect extent)
         {
-            VectorTile newTile = new VectorTile();
-            newTile.IsOverZoomed = this.IsOverZoomed;
-            
-            foreach(var layer in Layers)
+            var newTile = new VectorTile
             {
-                var vectorLayer = new VectorTileLayer();
-                vectorLayer.Name = layer.Name;
+                IsOverZoomed = this.IsOverZoomed
+            };
+
+            foreach (var layer in Layers)
+            {
+                var vectorLayer = new VectorTileLayer
+                {
+                    Name = layer.Name
+                };
 
                 foreach (var feature in layer.Features)
                 {
-                    var vectorFeature = new VectorTileFeature();
-                    vectorFeature.Attributes = new Dictionary<string, object>(feature.Attributes);
-                    vectorFeature.Extent = feature.Extent;
-                    vectorFeature.GeometryType = feature.GeometryType;
+                    var vectorFeature = new VectorTileFeature
+                    {
+                        Attributes = new Dictionary<string, object>(feature.Attributes),
+                        Extent = feature.Extent,
+                        GeometryType = feature.GeometryType
+                    };
 
-                    var vectorGeometry = new List<List<Point>>();
+                    var vectorGeometry = new List<List<VTPoint>>();
                     foreach (var geometry in feature.Geometry)
                     {
-                        var vectorPoints = new List<Point>();
+                        var vectorPoints = new List<VTPoint>();
 
                         foreach (var point in geometry)
                         {
-
                             var newX = Utils.ConvertRange(point.X, extent.Left, extent.Right, 0, vectorFeature.Extent);
                             var newY = Utils.ConvertRange(point.Y, extent.Top, extent.Bottom, 0, vectorFeature.Extent);
 
-                            vectorPoints.Add(new Point(newX, newY));
+                            vectorPoints.Add(new VTPoint(newX, newY));
                         }
 
                         vectorGeometry.Add(vectorPoints);
@@ -51,22 +56,5 @@ namespace VectorTileRenderer
 
             return newTile;
         }
-    }
-
-    public class VectorTileLayer
-    {
-        public string Name { get; set; }
-
-        public List<VectorTileFeature> Features = new List<VectorTileFeature>();
-    }
-
-    public class VectorTileFeature
-    {
-        public double Extent { get; set; }
-        public string GeometryType { get; set; }
-
-        public Dictionary<string, object> Attributes = new Dictionary<string, object>();
-
-        public List<List<Point>> Geometry = new List<List<Point>>();
     }
 }

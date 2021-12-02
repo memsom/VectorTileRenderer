@@ -112,18 +112,18 @@ namespace VectorTileRenderer.Sources
                     vectorFeature.GeometryType = convertGeometryType(feat.GeometryType);
                     vectorFeature.Attributes = feat.GetProperties();
 
-                    var vectorGeometry = new List<List<Point>>();
+                    var vectorGeometry = new List<List<VTPoint>>();
 
                     foreach (var points in feat.Geometry<int>())
                     {
-                        var vectorPoints = new List<Point>();
+                        var vectorPoints = new List<VTPoint>();
 
                         foreach (var coordinate in points)
                         {
                             var dX = (double)coordinate.X / (double)lyr.Extent;
                             var dY = (double)coordinate.Y / (double)lyr.Extent;
 
-                            vectorPoints.Add(new Point(dX, dY));
+                            vectorPoints.Add(new VTPoint(dX, dY));
 
                             //var newX = Utils.ConvertRange(dX, extent.Left, extent.Right, 0, vectorFeature.Extent);
                             //var newY = Utils.ConvertRange(dY, extent.Top, extent.Bottom, 0, vectorFeature.Extent);

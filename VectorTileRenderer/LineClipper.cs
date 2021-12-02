@@ -7,17 +7,7 @@ namespace VectorTileRenderer
 {
     static class LineClipper
     {
-        [Flags]
-        enum OutCode
-        {
-            Inside = 0,
-            Left = 1,
-            Right = 2,
-            Bottom = 4,
-            Top = 8
-        }
-
-        private static OutCode ComputeOutCode(double x, double y, Rect r)
+        private static OutCode ComputeOutCode(double x, double y, VTRect r)
         {
             var code = OutCode.Inside;
 
@@ -29,9 +19,9 @@ namespace VectorTileRenderer
             return code;
         }
 
-        private static OutCode ComputeOutCode(Point p, Rect r) { return ComputeOutCode(p.X, p.Y, r); }
+        private static OutCode ComputeOutCode(VTPoint p, VTRect r) { return ComputeOutCode(p.X, p.Y, r); }
 
-        private static Point CalculateIntersection(Rect r, Point p1, Point p2, OutCode clipTo)
+        private static VTPoint CalculateIntersection(VTRect r, VTPoint p1, VTPoint p2, OutCode clipTo)
         {
             var dx = (p2.X - p1.X);
             var dy = (p2.Y - p1.Y);
@@ -41,28 +31,28 @@ namespace VectorTileRenderer
 
             if (clipTo.HasFlag(OutCode.Top))
             {
-                return new Point(
+                return new VTPoint(
                     p1.X + slopeY * (r.Top - p1.Y),
                     r.Top
                     );
             }
             if (clipTo.HasFlag(OutCode.Bottom))
             {
-                return new Point(
+                return new VTPoint(
                     p1.X + slopeY * (r.Bottom - p1.Y),
                     r.Bottom
                     );
             }
             if (clipTo.HasFlag(OutCode.Right))
             {
-                return new Point(
+                return new VTPoint(
                     r.Right,
                     p1.Y + slopeX * (r.Right - p1.X)
                     );
             }
             if (clipTo.HasFlag(OutCode.Left))
             {
-                return new Point(
+                return new VTPoint(
                     r.Left,
                     p1.Y + slopeX * (r.Left - p1.X)
                     );
@@ -70,7 +60,7 @@ namespace VectorTileRenderer
             throw new ArgumentOutOfRangeException("clipTo = " + clipTo);
         }
 
-        public static Tuple<Point, Point> ClipSegment(Rect r, Point p1, Point p2)
+        public static Tuple<VTPoint, VTPoint> ClipSegment(VTRect r, VTPoint p1, VTPoint p2)
         {
             // classify the endpoints of the line
             var outCodeP1 = ComputeOutCode(p1, r);
@@ -118,14 +108,14 @@ namespace VectorTileRenderer
             // if clipping area contained a portion of the line
             if (accept)
             {
-                return new Tuple<Point, Point>(p1, p2);
+                return new Tuple<VTPoint, VTPoint>(p1, p2);
             }
 
             // the line did not intersect the clipping area
             return null;
         }
 
-        static Rect getLineRect(List<Point> polyLine)
+        static VTRect getLineRect(List<VTPoint> polyLine)
         {
             double minX = double.MaxValue;
             double minY = double.MaxValue;
@@ -153,10 +143,10 @@ namespace VectorTileRenderer
                 }
             }
 
-            return new Rect(minX, minY, maxX - minX, maxY - minY);
+            return new VTRect(minX, minY, maxX - minX, maxY - minY);
         }
 
-        public static List<Point> ClipPolyline(List<Point> polyLine, Rect bounds)
+        public static List<VTPoint> ClipPolyline(List<VTPoint> polyLine, VTRect bounds)
         {
             var lineRect = getLineRect(polyLine);
 
@@ -165,7 +155,7 @@ namespace VectorTileRenderer
                 return null;
             }
 
-            List<Point> newLine = null;
+            List<VTPoint> newLine = null;
 
             for (int i = 1; i < polyLine.Count; i++)
             {
@@ -178,7 +168,7 @@ namespace VectorTileRenderer
                 {
                     if(newLine == null)
                     {
-                        newLine = new List<Point>();
+                        newLine = new List<VTPoint>();
                         newLine.Add(newSegment.Item1);
                         newLine.Add(newSegment.Item2);
                     }
