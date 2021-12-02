@@ -54,4 +54,10 @@
 			<Version>1.0.115</Version>
 		</PackageReference>		
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Mapbox.VectorTiles\ExtensionMethods\ExtensionMethods.csproj" />
+	  <ProjectReference Include="..\Mapbox.VectorTiles\Geometry\Geometry.csproj" />
+	  <ProjectReference Include="..\Mapbox.VectorTiles\PbfReader\PbfReader.csproj" />
+	  <ProjectReference Include="..\Mapbox.VectorTiles\VectorTileReader\VectorTileReader.csproj" />
+	</ItemGroup>
 </Project>

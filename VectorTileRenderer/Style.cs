@@ -2,12 +2,28 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Drawing;
 
 namespace VectorTileRenderer
 {
+
+    static class DoubleExtension
+    {
+        private const double DefaultPrecision = 0.0001;
+
+        internal static bool BasicallyEqualTo(this double a, double b)
+        {
+            return a.BasicallyEqualTo(b, 0.0001);
+        }
+
+        internal static bool BasicallyEqualTo(this double a, double b, double precision)
+        {
+            return Math.Abs(a - b) <= precision;
+        }
+    }
+
     public class Brush
     {
         public int ZIndex { get; set; } = 0;
@@ -170,22 +186,22 @@ namespace VectorTileRenderer
 
                 if (sourceDict.ContainsKey("url"))
                 {
-                    source.URL = plainifyJson(sourceDict["url"]) as string;
+                    source.URL = PlainifyJson(sourceDict["url"]) as string;
                 }
 
                 if (sourceDict.ContainsKey("type"))
                 {
-                    source.Type = plainifyJson(sourceDict["type"]) as string;
+                    source.Type = PlainifyJson(sourceDict["type"]) as string;
                 }
 
                 if (sourceDict.ContainsKey("minzoom"))
                 {
-                    source.MinZoom = Convert.ToDouble(plainifyJson(sourceDict["minzoom"]));
+                    source.MinZoom = Convert.ToDouble(PlainifyJson(sourceDict["minzoom"]));
                 }
 
                 if (sourceDict.ContainsKey("maxzoom"))
                 {
-                    source.MaxZoom = Convert.ToDouble(plainifyJson(sourceDict["maxzoom"]));
+                    source.MaxZoom = Convert.ToDouble(PlainifyJson(sourceDict["maxzoom"]));
                 }
 
                 Sources[jSource.Name] = source;
@@ -201,49 +217,49 @@ namespace VectorTileRenderer
 
                 if (layerDict.ContainsKey("minzoom"))
                 {
-                    layer.MinZoom = Convert.ToDouble(plainifyJson(layerDict["minzoom"]));
+                    layer.MinZoom = Convert.ToDouble(PlainifyJson(layerDict["minzoom"]));
                 }
 
                 if (layerDict.ContainsKey("maxzoom"))
                 {
-                    layer.MaxZoom = Convert.ToDouble(plainifyJson(layerDict["maxzoom"]));
+                    layer.MaxZoom = Convert.ToDouble(PlainifyJson(layerDict["maxzoom"]));
                 }
 
                 if (layerDict.ContainsKey("id"))
                 {
-                    layer.ID = plainifyJson(layerDict["id"]) as string;
+                    layer.ID = PlainifyJson(layerDict["id"]) as string;
                 }
 
                 if (layerDict.ContainsKey("type"))
                 {
-                    layer.Type = plainifyJson(layerDict["type"]) as string;
+                    layer.Type = PlainifyJson(layerDict["type"]) as string;
                 }
 
                 if (layerDict.ContainsKey("source"))
                 {
-                    layer.SourceName = plainifyJson(layerDict["source"]) as string;
+                    layer.SourceName = PlainifyJson(layerDict["source"]) as string;
                     layer.Source = Sources[layer.SourceName];
                 }
 
                 if (layerDict.ContainsKey("source-layer"))
                 {
-                    layer.SourceLayer = plainifyJson(layerDict["source-layer"]) as string;
+                    layer.SourceLayer = PlainifyJson(layerDict["source-layer"]) as string;
                 }
 
                 if (layerDict.ContainsKey("paint"))
                 {
-                    layer.Paint = plainifyJson(layerDict["paint"]) as Dictionary<string, object>;
+                    layer.Paint = PlainifyJson(layerDict["paint"]) as Dictionary<string, object>;
                 }
 
                 if (layerDict.ContainsKey("layout"))
                 {
-                    layer.Layout = plainifyJson(layerDict["layout"]) as Dictionary<string, object>;
+                    layer.Layout = PlainifyJson(layerDict["layout"]) as Dictionary<string, object>;
                 }
 
                 if (layerDict.ContainsKey("filter"))
                 {
                     var filterArray = layerDict["filter"] as JArray;
-                    layer.Filter = plainifyJson(filterArray) as object[];
+                    layer.Filter = PlainifyJson(filterArray) as object[];
                 }
 
                 Layers.Add(layer);
@@ -274,25 +290,23 @@ namespace VectorTileRenderer
             Sources[name].Provider = provider;
         }
 
-        object plainifyJson(JToken token)
+        object PlainifyJson(JToken token)
         {
             if (token.Type == JTokenType.Object)
             {
                 IDictionary<string, JToken> dict = token as JObject;
-                return dict.Select(pair => new KeyValuePair<string, object>(pair.Key, plainifyJson(pair.Value)))
+                return dict.Select(pair => new KeyValuePair<string, object>(pair.Key, PlainifyJson(pair.Value)))
                         .ToDictionary(key => key.Key, value => value.Value);
             }
             else if (token.Type == JTokenType.Array)
             {
                 var array = token as JArray;
-                return array.Select(item => plainifyJson(item)).ToArray();
+                return array.Select(item => PlainifyJson(item)).ToArray();
             }
             else
             {
                 return token.ToObject<object>();
             }
-
-            return null;
         }
 
         public Brush[] GetStyleByType(string type, double zoom, double scale = 1)
@@ -642,6 +656,70 @@ namespace VectorTileRenderer
             }
             return new string(newChars, 0, (int)(currentChar - newChars));
         }
+        public static Color HSLAToColor(double a, double th, double ts, double tl)
+        {
+            double h = th / 365;
+            double colorComponent = 0;
+            double num = 0;
+            double colorComponent1 = 0;
+            double s = ts / 100;
+            double l = tl / 100;
+            if (!l.BasicallyEqualTo(0))
+            {
+                if (!s.BasicallyEqualTo(0))
+                {
+                    double num1 = (l < 0.5 ? l * (1 + s) : l + s - l * s);
+                    double num2 = 2 * l - num1;
+                    colorComponent = GetColorComponent(num2, num1, h + 0.333333333333333);
+                    num = GetColorComponent(num2, num1, h);
+                    colorComponent1 = GetColorComponent(num2, num1, h - 0.333333333333333);
+                }
+                else
+                {
+                    double num3 = l;
+                    colorComponent1 = num3;
+                    num = num3;
+                    colorComponent = num3;
+                }
+            }
+
+            byte r = (255 * colorComponent) > 255 ? (byte)255 : (byte)(255 * colorComponent);
+            byte g = (255 * num) > 255 ? (byte)255 : (byte)(255 * num);
+            byte b = (255 * colorComponent1) > 255 ? (byte)255 : (byte)(255 * colorComponent1);
+
+            return Color.FromArgb(r, g, b);
+        }
+
+        static double GetColorComponent(double temp1, double temp2, double temp3)
+        {
+            temp3 = MoveIntoRange(temp3);
+            if (temp3 < 0.166666666666667)
+            {
+                return temp1 + (temp2 - temp1) * 6 * temp3;
+            }
+            if (temp3 < 0.5)
+            {
+                return temp2;
+            }
+            if (temp3 >= 0.666666666666667)
+            {
+                return temp1;
+            }
+            return temp1 + (temp2 - temp1) * (0.666666666666667 - temp3) * 6;
+        }
+        static double MoveIntoRange(double temp3)
+        {
+            if (temp3 < 0)
+            {
+                return temp3 + 1;
+            }
+            if (temp3 <= 1)
+            {
+                return temp3;
+            }
+            return temp3 - 1;
+        }
+
 
         Color ParseColor(object iColor)
         {
@@ -670,14 +748,7 @@ namespace VectorTileRenderer
                 double s = double.Parse(segments[2]);
                 double l = double.Parse(segments[3]);
 
-                var color = (new ColorMine.ColorSpaces.Hsl()
-                {
-                    H = h,
-                    S = s,
-                    L = l,
-                }).ToRgb();
-
-                return Color.FromArgb((byte)color.R, (byte)color.G, (byte)color.B);
+                return HSLAToColor(255, h, s, l);
             }
 
             if (colorString.StartsWith("hsla("))
@@ -688,14 +759,7 @@ namespace VectorTileRenderer
                 double l = double.Parse(segments[3]);
                 double a = double.Parse(segments[4]) * 255;
 
-                var color = (new ColorMine.ColorSpaces.Hsl()
-                {
-                    H = h,
-                    S = s,
-                    L = l,
-                }).ToRgb();
-
-                return Color.FromArgb((byte)(a), (byte)color.R, (byte)color.G, (byte)color.B);
+                return HSLAToColor(a, h, s, l);
             }
 
             if (colorString.StartsWith("rgba("))
@@ -716,7 +780,7 @@ namespace VectorTileRenderer
                 double g = double.Parse(segments[2]);
                 double b = double.Parse(segments[3]);
 
-                return Color.FromArgb((byte)r, (byte)g, (byte)b);
+                return Color.FromArgb(255, (byte)r, (byte)g, (byte)b);
             }
 
             try
