@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Imaging;
 
 namespace VectorTileRenderer
 {
@@ -34,7 +31,7 @@ namespace VectorTileRenderer
             public Brush Brush { get; set; } = null;
         }
 
-        public async static Task<BitmapSource> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
+        public async static Task<byte[]> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
             string layerString = whiteListLayers == null ? "" : string.Join(",-", whiteListLayers.ToArray());
 
@@ -65,7 +62,7 @@ namespace VectorTileRenderer
             {
                 if (File.Exists(path))
                 {
-                    return loadBitmap(path);
+                    return LoadBitmap(path);
                 }
             }
 
@@ -87,10 +84,12 @@ namespace VectorTileRenderer
                               }
 
                               using (var fileStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))
+                              using (var br = new BinaryWriter(fileStream))
                               {
-                                  BitmapEncoder encoder = new PngBitmapEncoder();
-                                  encoder.Frames.Add(BitmapFrame.Create(bitmap));
-                                  encoder.Save(fileStream);
+                                  br.Write(bitmap);
+                                  br.Flush();
+                                  br.Close();
+                                  fileStream.Close();
                               }
                           }
                       }
@@ -108,22 +107,12 @@ namespace VectorTileRenderer
             return bitmap;
         }
 
-        static BitmapSource loadBitmap(string path)
+        static byte[] LoadBitmap(string path)
         {
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                var fsBitmap = new BitmapImage();
-                fsBitmap.BeginInit();
-                fsBitmap.StreamSource = stream;
-                fsBitmap.CacheOption = BitmapCacheOption.OnLoad;
-                fsBitmap.EndInit();
-                fsBitmap.Freeze();
-
-                return fsBitmap;
-            }
+            return File.ReadAllBytes(path);
         }
 
-        public async static Task<BitmapSource> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
+        public async static Task<byte[]> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
             Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
             Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
@@ -357,7 +346,8 @@ namespace VectorTileRenderer
                         else if (feature.GeometryType == "Unknown")
                         {
                             canvas.DrawUnknown(geometry, brush);
-                        } else
+                        }
+                        else
                         {
 
                         }
