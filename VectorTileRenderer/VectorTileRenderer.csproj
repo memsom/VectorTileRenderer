@@ -142,6 +142,7 @@
   <ItemGroup>
     <Compile Include="GlobalMercator.cs" />
     <Compile Include="ICanvas.cs" />
+    <Compile Include="Renderer.cs" />
     <Compile Include="SkiaGL.cs" />
     <Compile Include="Sources\RasterTileSource.cs" />
     <Compile Include="Sources\ITileSource.cs" />
@@ -150,7 +151,6 @@
     <Compile Include="Sources\MbTilesSource.cs" />
     <Compile Include="Sources\PbfTileSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Renderer.cs" />
     <Compile Include="SkiaCanvas.cs" />
     <Compile Include="Style.cs" />
     <Compile Include="Utils.cs" />
