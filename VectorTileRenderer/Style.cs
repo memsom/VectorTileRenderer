@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -63,16 +64,16 @@ namespace VectorTileRenderer
 
     public class Paint
     {
-        public Color BackgroundColor { get; set; }
+        public SKColor BackgroundColor { get; set; }
         public string BackgroundPattern { get; set; }
         public double BackgroundOpacity { get; set; } = 1;
 
-        public Color FillColor { get; set; }
+        public SKColor FillColor { get; set; }
         public string FillPattern { get; set; }
         public VTPoint FillTranslate { get; set; } = new VTPoint();
         public double FillOpacity { get; set; } = 1;
 
-        public Color LineColor { get; set; }
+        public SKColor LineColor { get; set; }
         public string LinePattern { get; set; }
         public VTPoint LineTranslate { get; set; } = new VTPoint();
         public VTPenLineCap LineCap { get; set; } = VTPenLineCap.Flat;
@@ -89,14 +90,14 @@ namespace VectorTileRenderer
         public VTPoint IconOffset { get; set; } = new VTPoint();
         public double IconOpacity { get; set; } = 1;
 
-        public Color TextColor { get; set; }
+        public SKColor TextColor { get; set; }
         public string[] TextFont { get; set; } = new string[] { "Open Sans Regular", "Arial Unicode MS Regular" };
         public double TextSize { get; set; } = 16;
         public double TextMaxWidth { get; set; } = 10;
         public VTTextAlignment TextJustify { get; set; } = VTTextAlignment.Center;
         public double TextRotate { get; set; } = 0;
         public VTPoint TextOffset { get; set; } = new VTPoint();
-        public Color TextStrokeColor { get; set; }
+        public SKColor TextStrokeColor { get; set; }
         public double TextStrokeWidth { get; set; } = 0;
         public double TextStrokeBlur { get; set; } = 0;
         public bool TextOptional { get; set; } = false;
@@ -331,17 +332,16 @@ namespace VectorTileRenderer
             return results.ToArray();
         }
 
-        public Color GetBackgroundColor(double zoom)
+        public SKColor GetBackgroundColor(double zoom)
         {
             var brushes = GetStyleByType("background", zoom, 1);
 
             foreach (var brush in brushes)
             {
-                var newColor = Color.FromArgb((byte)Math.Max(0, Math.Min(255, brush.Paint.BackgroundOpacity * brush.Paint.BackgroundColor.A)), brush.Paint.BackgroundColor.R, brush.Paint.BackgroundColor.G, brush.Paint.BackgroundColor.B);
-                return newColor;
+                return new SKColor(brush.Paint.BackgroundColor.Red, brush.Paint.BackgroundColor.Green, brush.Paint.BackgroundColor.Blue, (byte)Math.Max(0, Math.Min(255, brush.Paint.BackgroundOpacity * brush.Paint.BackgroundColor.Alpha)));
             }
 
-            return Color.White;
+            return SKColors.White;
         }
 
         //public Brush[] GetBrushesCached(double zoom, double scale, string type, string id, Dictionary<string, object> attributes)
@@ -656,7 +656,7 @@ namespace VectorTileRenderer
             }
             return new string(newChars, 0, (int)(currentChar - newChars));
         }
-        public static Color HSLAToColor(double a, double th, double ts, double tl)
+        public static SKColor HSLAToColor(double ta, double th, double ts, double tl)
         {
             double h = th / 365;
             double colorComponent = 0;
@@ -686,8 +686,9 @@ namespace VectorTileRenderer
             byte r = (255 * colorComponent) > 255 ? (byte)255 : (byte)(255 * colorComponent);
             byte g = (255 * num) > 255 ? (byte)255 : (byte)(255 * num);
             byte b = (255 * colorComponent1) > 255 ? (byte)255 : (byte)(255 * colorComponent1);
+            byte a = (byte)ta;
 
-            return Color.FromArgb(r, g, b);
+            return new SKColor(r, g, b, a);
         }
 
         static double GetColorComponent(double temp1, double temp2, double temp3)
@@ -721,11 +722,17 @@ namespace VectorTileRenderer
         }
 
 
-        Color ParseColor(object iColor)
+        SKColor ParseColor(object iColor)
         {
             if (iColor.GetType() == typeof(Color))
             {
-                return (Color)iColor;
+                var color = (Color)iColor;
+                return new SKColor(color.R, color.G, color.B, color.A);
+            }
+
+            if (iColor.GetType() == typeof(SKColor))
+            {
+                return (SKColor)iColor;
             }
 
             if (iColor.GetType() != typeof(string))
@@ -737,8 +744,8 @@ namespace VectorTileRenderer
 
             if (colorString[0] == '#')
             {
-                var color = VTKnownColors.ColorStringToKnownColor(colorString);
-                return Color.FromArgb((int)color);
+                //var color = VTKnownColors.ColorStringToKnownColor(colorString);
+                return SKColor.Parse(colorString);
             }
 
             if (colorString.StartsWith("hsl("))
@@ -770,7 +777,7 @@ namespace VectorTileRenderer
                 double b = double.Parse(segments[3]);
                 double a = double.Parse(segments[4]) * 255;
 
-                return Color.FromArgb((byte)a, (byte)r, (byte)g, (byte)b);
+                return new SKColor((byte)r, (byte)g, (byte)b, (byte)a);
             }
 
             if (colorString.StartsWith("rgb("))
@@ -780,12 +787,12 @@ namespace VectorTileRenderer
                 double g = double.Parse(segments[2]);
                 double b = double.Parse(segments[3]);
 
-                return Color.FromArgb(255, (byte)r, (byte)g, (byte)b);
+                return new SKColor((byte)r, (byte)g, (byte)b, 255);
             }
 
             try
             {
-                return (Color)ConvertFromString(colorString);
+                return ConvertFromString(colorString);
             }
             catch (Exception e)
             {
@@ -794,11 +801,11 @@ namespace VectorTileRenderer
             //return Colors.Violet;
         }
 
-        public static object ConvertFromString(string value)
+        public static SKColor ConvertFromString(string value)
         {
             if (null == value)
             {
-                return null;
+                return SKColors.Transparent;
             }
 
             return VTKnownColors.ParseColor(value);

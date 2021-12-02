@@ -1,6 +1,8 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace VectorTileRenderer
 {
@@ -10,10 +12,15 @@ namespace VectorTileRenderer
 
         static VTKnownColors()
         {
-            Array knownColorValues = Enum.GetValues(typeof(VTKnownColor));
-            foreach (VTKnownColor colorValue in knownColorValues)
+            var type = typeof(SKColors);
+            var fia = type.GetFields()
+                          .Where(x => x.FieldType == typeof(SKColor));
+
+            foreach (var item in fia)
             {
-                string aRGBString = String.Format("#{0,8:X8}", (uint)colorValue);
+                var colorValue = (SKColor)item.GetValue(null);
+                uint coloruint = (uint)(colorValue.Alpha << 24 | colorValue.Red << 16 | colorValue.Green << 8 | colorValue.Blue);
+                string aRGBString = String.Format("#{0,8:X8}", coloruint);
                 s_knownArgbColors[aRGBString] = colorValue;
             }
         }
@@ -67,7 +74,7 @@ namespace VectorTileRenderer
         }
 
 
-        internal static Color ParseColor(string color)
+        internal static SKColor ParseColor(string color)
         {
             bool isPossibleKnowColor;
             bool isNumericColor;
@@ -90,14 +97,7 @@ namespace VectorTileRenderer
             }
             else
             {
-                VTKnownColor kc = VTKnownColors.ColorStringToKnownColor(trimmedColor);
-
-                if (kc == VTKnownColor.UnknownColor)
-                {
-                    throw new FormatException("Bad format");
-                }
-
-                return Color.FromArgb((int)kc);
+                return VTKnownColors.ColorStringToKnownColor(trimmedColor);
             }
         }
 
@@ -126,7 +126,7 @@ namespace VectorTileRenderer
             throw new FormatException("Bad format");
         }
 
-        static private Color ParseHexColor(string trimmedColor)
+        static private SKColor ParseHexColor(string trimmedColor)
         {
             int a, r, g, b;
             a = 255;
@@ -165,7 +165,7 @@ namespace VectorTileRenderer
                 b = b + b * 16;
             }
 
-            return (Color.FromArgb((byte)a, (byte)r, (byte)g, (byte)b));
+            return new SKColor((byte)r, (byte)g, (byte)b, (byte)a);
         }
 
         internal const string s_ContextColor = "ContextColor ";
@@ -173,7 +173,7 @@ namespace VectorTileRenderer
 
 
         /// Return the VTKnownColor from a color string.  If there's no match, VTKnownColor.UnknownColor
-        internal static VTKnownColor ColorStringToKnownColor(string colorString)
+        static SKColor ColorStringToKnownColor(string colorString)
         {
             if (null != colorString)
             {
@@ -186,41 +186,41 @@ namespace VectorTileRenderer
                 switch (colorUpper.Length)
                 {
                     case 3:
-                        if (colorUpper.Equals("RED")) return VTKnownColor.Red;
-                        if (colorUpper.Equals("TAN")) return VTKnownColor.Tan;
+                        if (colorUpper.Equals("RED")) return SKColors.Red;
+                        if (colorUpper.Equals("TAN")) return SKColors.Tan;
                         break;
                     case 4:
                         switch (colorUpper[0])
                         {
                             case 'A':
-                                if (colorUpper.Equals("AQUA")) return VTKnownColor.Aqua;
+                                if (colorUpper.Equals("AQUA")) return SKColors.Aqua;
                                 break;
                             case 'B':
-                                if (colorUpper.Equals("BLUE")) return VTKnownColor.Blue;
+                                if (colorUpper.Equals("BLUE")) return SKColors.Blue;
                                 break;
                             case 'C':
-                                if (colorUpper.Equals("CYAN")) return VTKnownColor.Cyan;
+                                if (colorUpper.Equals("CYAN")) return SKColors.Cyan;
                                 break;
                             case 'G':
-                                if (colorUpper.Equals("GOLD")) return VTKnownColor.Gold;
-                                if (colorUpper.Equals("GRAY")) return VTKnownColor.Gray;
+                                if (colorUpper.Equals("GOLD")) return SKColors.Gold;
+                                if (colorUpper.Equals("GRAY")) return SKColors.Gray;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LIME")) return VTKnownColor.Lime;
+                                if (colorUpper.Equals("LIME")) return SKColors.Lime;
                                 break;
                             case 'N':
-                                if (colorUpper.Equals("NAVY")) return VTKnownColor.Navy;
+                                if (colorUpper.Equals("NAVY")) return SKColors.Navy;
                                 break;
                             case 'P':
-                                if (colorUpper.Equals("PERU")) return VTKnownColor.Peru;
-                                if (colorUpper.Equals("PINK")) return VTKnownColor.Pink;
-                                if (colorUpper.Equals("PLUM")) return VTKnownColor.Plum;
+                                if (colorUpper.Equals("PERU")) return SKColors.Peru;
+                                if (colorUpper.Equals("PINK")) return SKColors.Pink;
+                                if (colorUpper.Equals("PLUM")) return SKColors.Plum;
                                 break;
                             case 'S':
-                                if (colorUpper.Equals("SNOW")) return VTKnownColor.Snow;
+                                if (colorUpper.Equals("SNOW")) return SKColors.Snow;
                                 break;
                             case 'T':
-                                if (colorUpper.Equals("TEAL")) return VTKnownColor.Teal;
+                                if (colorUpper.Equals("TEAL")) return SKColors.Teal;
                                 break;
                         }
                         break;
@@ -228,34 +228,34 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'A':
-                                if (colorUpper.Equals("AZURE")) return VTKnownColor.Azure;
+                                if (colorUpper.Equals("AZURE")) return SKColors.Azure;
                                 break;
                             case 'B':
-                                if (colorUpper.Equals("BEIGE")) return VTKnownColor.Beige;
-                                if (colorUpper.Equals("BLACK")) return VTKnownColor.Black;
-                                if (colorUpper.Equals("BROWN")) return VTKnownColor.Brown;
+                                if (colorUpper.Equals("BEIGE")) return SKColors.Beige;
+                                if (colorUpper.Equals("BLACK")) return SKColors.Black;
+                                if (colorUpper.Equals("BROWN")) return SKColors.Brown;
                                 break;
                             case 'C':
-                                if (colorUpper.Equals("CORAL")) return VTKnownColor.Coral;
+                                if (colorUpper.Equals("CORAL")) return SKColors.Coral;
                                 break;
                             case 'G':
-                                if (colorUpper.Equals("GREEN")) return VTKnownColor.Green;
+                                if (colorUpper.Equals("GREEN")) return SKColors.Green;
                                 break;
                             case 'I':
-                                if (colorUpper.Equals("IVORY")) return VTKnownColor.Ivory;
+                                if (colorUpper.Equals("IVORY")) return SKColors.Ivory;
                                 break;
                             case 'K':
-                                if (colorUpper.Equals("KHAKI")) return VTKnownColor.Khaki;
+                                if (colorUpper.Equals("KHAKI")) return SKColors.Khaki;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LINEN")) return VTKnownColor.Linen;
+                                if (colorUpper.Equals("LINEN")) return SKColors.Linen;
                                 break;
                             case 'O':
-                                if (colorUpper.Equals("OLIVE")) return VTKnownColor.Olive;
+                                if (colorUpper.Equals("OLIVE")) return SKColors.Olive;
                                 break;
                             case 'W':
-                                if (colorUpper.Equals("WHEAT")) return VTKnownColor.Wheat;
-                                if (colorUpper.Equals("WHITE")) return VTKnownColor.White;
+                                if (colorUpper.Equals("WHEAT")) return SKColors.Wheat;
+                                if (colorUpper.Equals("WHITE")) return SKColors.White;
                                 break;
                         }
                         break;
@@ -263,34 +263,34 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'B':
-                                if (colorUpper.Equals("BISQUE")) return VTKnownColor.Bisque;
+                                if (colorUpper.Equals("BISQUE")) return SKColors.Bisque;
                                 break;
                             case 'I':
-                                if (colorUpper.Equals("INDIGO")) return VTKnownColor.Indigo;
+                                if (colorUpper.Equals("INDIGO")) return SKColors.Indigo;
                                 break;
                             case 'M':
-                                if (colorUpper.Equals("MAROON")) return VTKnownColor.Maroon;
+                                if (colorUpper.Equals("MAROON")) return SKColors.Maroon;
                                 break;
                             case 'O':
-                                if (colorUpper.Equals("ORANGE")) return VTKnownColor.Orange;
-                                if (colorUpper.Equals("ORCHID")) return VTKnownColor.Orchid;
+                                if (colorUpper.Equals("ORANGE")) return SKColors.Orange;
+                                if (colorUpper.Equals("ORCHID")) return SKColors.Orchid;
                                 break;
                             case 'P':
-                                if (colorUpper.Equals("PURPLE")) return VTKnownColor.Purple;
+                                if (colorUpper.Equals("PURPLE")) return SKColors.Purple;
                                 break;
                             case 'S':
-                                if (colorUpper.Equals("SALMON")) return VTKnownColor.Salmon;
-                                if (colorUpper.Equals("SIENNA")) return VTKnownColor.Sienna;
-                                if (colorUpper.Equals("SILVER")) return VTKnownColor.Silver;
+                                if (colorUpper.Equals("SALMON")) return SKColors.Salmon;
+                                if (colorUpper.Equals("SIENNA")) return SKColors.Sienna;
+                                if (colorUpper.Equals("SILVER")) return SKColors.Silver;
                                 break;
                             case 'T':
-                                if (colorUpper.Equals("TOMATO")) return VTKnownColor.Tomato;
+                                if (colorUpper.Equals("TOMATO")) return SKColors.Tomato;
                                 break;
                             case 'V':
-                                if (colorUpper.Equals("VIOLET")) return VTKnownColor.Violet;
+                                if (colorUpper.Equals("VIOLET")) return SKColors.Violet;
                                 break;
                             case 'Y':
-                                if (colorUpper.Equals("YELLOW")) return VTKnownColor.Yellow;
+                                if (colorUpper.Equals("YELLOW")) return SKColors.Yellow;
                                 break;
                         }
                         break;
@@ -298,29 +298,29 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'C':
-                                if (colorUpper.Equals("CRIMSON")) return VTKnownColor.Crimson;
+                                if (colorUpper.Equals("CRIMSON")) return SKColors.Crimson;
                                 break;
                             case 'D':
-                                if (colorUpper.Equals("DARKRED")) return VTKnownColor.DarkRed;
-                                if (colorUpper.Equals("DIMGRAY")) return VTKnownColor.DimGray;
+                                if (colorUpper.Equals("DARKRED")) return SKColors.DarkRed;
+                                if (colorUpper.Equals("DIMGRAY")) return SKColors.DimGray;
                                 break;
                             case 'F':
-                                if (colorUpper.Equals("FUCHSIA")) return VTKnownColor.Fuchsia;
+                                if (colorUpper.Equals("FUCHSIA")) return SKColors.Fuchsia;
                                 break;
                             case 'H':
-                                if (colorUpper.Equals("HOTPINK")) return VTKnownColor.HotPink;
+                                if (colorUpper.Equals("HOTPINK")) return SKColors.HotPink;
                                 break;
                             case 'M':
-                                if (colorUpper.Equals("MAGENTA")) return VTKnownColor.Magenta;
+                                if (colorUpper.Equals("MAGENTA")) return SKColors.Magenta;
                                 break;
                             case 'O':
-                                if (colorUpper.Equals("OLDLACE")) return VTKnownColor.OldLace;
+                                if (colorUpper.Equals("OLDLACE")) return SKColors.OldLace;
                                 break;
                             case 'S':
-                                if (colorUpper.Equals("SKYBLUE")) return VTKnownColor.SkyBlue;
+                                if (colorUpper.Equals("SKYBLUE")) return SKColors.SkyBlue;
                                 break;
                             case 'T':
-                                if (colorUpper.Equals("THISTLE")) return VTKnownColor.Thistle;
+                                if (colorUpper.Equals("THISTLE")) return SKColors.Thistle;
                                 break;
                         }
                         break;
@@ -328,26 +328,26 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'C':
-                                if (colorUpper.Equals("CORNSILK")) return VTKnownColor.Cornsilk;
+                                if (colorUpper.Equals("CORNSILK")) return SKColors.Cornsilk;
                                 break;
                             case 'D':
-                                if (colorUpper.Equals("DARKBLUE")) return VTKnownColor.DarkBlue;
-                                if (colorUpper.Equals("DARKCYAN")) return VTKnownColor.DarkCyan;
-                                if (colorUpper.Equals("DARKGRAY")) return VTKnownColor.DarkGray;
-                                if (colorUpper.Equals("DEEPPINK")) return VTKnownColor.DeepPink;
+                                if (colorUpper.Equals("DARKBLUE")) return SKColors.DarkBlue;
+                                if (colorUpper.Equals("DARKCYAN")) return SKColors.DarkCyan;
+                                if (colorUpper.Equals("DARKGRAY")) return SKColors.DarkGray;
+                                if (colorUpper.Equals("DEEPPINK")) return SKColors.DeepPink;
                                 break;
                             case 'H':
-                                if (colorUpper.Equals("HONEYDEW")) return VTKnownColor.Honeydew;
+                                if (colorUpper.Equals("HONEYDEW")) return SKColors.Honeydew;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LAVENDER")) return VTKnownColor.Lavender;
+                                if (colorUpper.Equals("LAVENDER")) return SKColors.Lavender;
                                 break;
                             case 'M':
-                                if (colorUpper.Equals("MOCCASIN")) return VTKnownColor.Moccasin;
+                                if (colorUpper.Equals("MOCCASIN")) return SKColors.Moccasin;
                                 break;
                             case 'S':
-                                if (colorUpper.Equals("SEAGREEN")) return VTKnownColor.SeaGreen;
-                                if (colorUpper.Equals("SEASHELL")) return VTKnownColor.SeaShell;
+                                if (colorUpper.Equals("SEAGREEN")) return SKColors.SeaGreen;
+                                if (colorUpper.Equals("SEASHELL")) return SKColors.SeaShell;
                                 break;
                         }
                         break;
@@ -355,60 +355,60 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'A':
-                                if (colorUpper.Equals("ALICEBLUE")) return VTKnownColor.AliceBlue;
+                                if (colorUpper.Equals("ALICEBLUE")) return SKColors.AliceBlue;
                                 break;
                             case 'B':
-                                if (colorUpper.Equals("BURLYWOOD")) return VTKnownColor.BurlyWood;
+                                if (colorUpper.Equals("BURLYWOOD")) return SKColors.BurlyWood;
                                 break;
                             case 'C':
-                                if (colorUpper.Equals("CADETBLUE")) return VTKnownColor.CadetBlue;
-                                if (colorUpper.Equals("CHOCOLATE")) return VTKnownColor.Chocolate;
+                                if (colorUpper.Equals("CADETBLUE")) return SKColors.CadetBlue;
+                                if (colorUpper.Equals("CHOCOLATE")) return SKColors.Chocolate;
                                 break;
                             case 'D':
-                                if (colorUpper.Equals("DARKGREEN")) return VTKnownColor.DarkGreen;
-                                if (colorUpper.Equals("DARKKHAKI")) return VTKnownColor.DarkKhaki;
+                                if (colorUpper.Equals("DARKGREEN")) return SKColors.DarkGreen;
+                                if (colorUpper.Equals("DARKKHAKI")) return SKColors.DarkKhaki;
                                 break;
                             case 'F':
-                                if (colorUpper.Equals("FIREBRICK")) return VTKnownColor.Firebrick;
+                                if (colorUpper.Equals("FIREBRICK")) return SKColors.Firebrick;
                                 break;
                             case 'G':
-                                if (colorUpper.Equals("GAINSBORO")) return VTKnownColor.Gainsboro;
-                                if (colorUpper.Equals("GOLDENROD")) return VTKnownColor.Goldenrod;
+                                if (colorUpper.Equals("GAINSBORO")) return SKColors.Gainsboro;
+                                if (colorUpper.Equals("GOLDENROD")) return SKColors.Goldenrod;
                                 break;
                             case 'I':
-                                if (colorUpper.Equals("INDIANRED")) return VTKnownColor.IndianRed;
+                                if (colorUpper.Equals("INDIANRED")) return SKColors.IndianRed;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LAWNGREEN")) return VTKnownColor.LawnGreen;
-                                if (colorUpper.Equals("LIGHTBLUE")) return VTKnownColor.LightBlue;
-                                if (colorUpper.Equals("LIGHTCYAN")) return VTKnownColor.LightCyan;
-                                if (colorUpper.Equals("LIGHTGRAY")) return VTKnownColor.LightGray;
-                                if (colorUpper.Equals("LIGHTPINK")) return VTKnownColor.LightPink;
-                                if (colorUpper.Equals("LIMEGREEN")) return VTKnownColor.LimeGreen;
+                                if (colorUpper.Equals("LAWNGREEN")) return SKColors.LawnGreen;
+                                if (colorUpper.Equals("LIGHTBLUE")) return SKColors.LightBlue;
+                                if (colorUpper.Equals("LIGHTCYAN")) return SKColors.LightCyan;
+                                if (colorUpper.Equals("LIGHTGRAY")) return SKColors.LightGray;
+                                if (colorUpper.Equals("LIGHTPINK")) return SKColors.LightPink;
+                                if (colorUpper.Equals("LIMEGREEN")) return SKColors.LimeGreen;
                                 break;
                             case 'M':
-                                if (colorUpper.Equals("MINTCREAM")) return VTKnownColor.MintCream;
-                                if (colorUpper.Equals("MISTYROSE")) return VTKnownColor.MistyRose;
+                                if (colorUpper.Equals("MINTCREAM")) return SKColors.MintCream;
+                                if (colorUpper.Equals("MISTYROSE")) return SKColors.MistyRose;
                                 break;
                             case 'O':
-                                if (colorUpper.Equals("OLIVEDRAB")) return VTKnownColor.OliveDrab;
-                                if (colorUpper.Equals("ORANGERED")) return VTKnownColor.OrangeRed;
+                                if (colorUpper.Equals("OLIVEDRAB")) return SKColors.OliveDrab;
+                                if (colorUpper.Equals("ORANGERED")) return SKColors.OrangeRed;
                                 break;
                             case 'P':
-                                if (colorUpper.Equals("PALEGREEN")) return VTKnownColor.PaleGreen;
-                                if (colorUpper.Equals("PEACHPUFF")) return VTKnownColor.PeachPuff;
+                                if (colorUpper.Equals("PALEGREEN")) return SKColors.PaleGreen;
+                                if (colorUpper.Equals("PEACHPUFF")) return SKColors.PeachPuff;
                                 break;
                             case 'R':
-                                if (colorUpper.Equals("ROSYBROWN")) return VTKnownColor.RosyBrown;
-                                if (colorUpper.Equals("ROYALBLUE")) return VTKnownColor.RoyalBlue;
+                                if (colorUpper.Equals("ROSYBROWN")) return SKColors.RosyBrown;
+                                if (colorUpper.Equals("ROYALBLUE")) return SKColors.RoyalBlue;
                                 break;
                             case 'S':
-                                if (colorUpper.Equals("SLATEBLUE")) return VTKnownColor.SlateBlue;
-                                if (colorUpper.Equals("SLATEGRAY")) return VTKnownColor.SlateGray;
-                                if (colorUpper.Equals("STEELBLUE")) return VTKnownColor.SteelBlue;
+                                if (colorUpper.Equals("SLATEBLUE")) return SKColors.SlateBlue;
+                                if (colorUpper.Equals("SLATEGRAY")) return SKColors.SlateGray;
+                                if (colorUpper.Equals("STEELBLUE")) return SKColors.SteelBlue;
                                 break;
                             case 'T':
-                                if (colorUpper.Equals("TURQUOISE")) return VTKnownColor.Turquoise;
+                                if (colorUpper.Equals("TURQUOISE")) return SKColors.Turquoise;
                                 break;
                         }
                         break;
@@ -416,40 +416,40 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'A':
-                                if (colorUpper.Equals("AQUAMARINE")) return VTKnownColor.Aquamarine;
+                                if (colorUpper.Equals("AQUAMARINE")) return SKColors.Aquamarine;
                                 break;
                             case 'B':
-                                if (colorUpper.Equals("BLUEVIOLET")) return VTKnownColor.BlueViolet;
+                                if (colorUpper.Equals("BLUEVIOLET")) return SKColors.BlueViolet;
                                 break;
                             case 'C':
-                                if (colorUpper.Equals("CHARTREUSE")) return VTKnownColor.Chartreuse;
+                                if (colorUpper.Equals("CHARTREUSE")) return SKColors.Chartreuse;
                                 break;
                             case 'D':
-                                if (colorUpper.Equals("DARKORANGE")) return VTKnownColor.DarkOrange;
-                                if (colorUpper.Equals("DARKORCHID")) return VTKnownColor.DarkOrchid;
-                                if (colorUpper.Equals("DARKSALMON")) return VTKnownColor.DarkSalmon;
-                                if (colorUpper.Equals("DARKVIOLET")) return VTKnownColor.DarkViolet;
-                                if (colorUpper.Equals("DODGERBLUE")) return VTKnownColor.DodgerBlue;
+                                if (colorUpper.Equals("DARKORANGE")) return SKColors.DarkOrange;
+                                if (colorUpper.Equals("DARKORCHID")) return SKColors.DarkOrchid;
+                                if (colorUpper.Equals("DARKSALMON")) return SKColors.DarkSalmon;
+                                if (colorUpper.Equals("DARKVIOLET")) return SKColors.DarkViolet;
+                                if (colorUpper.Equals("DODGERBLUE")) return SKColors.DodgerBlue;
                                 break;
                             case 'G':
-                                if (colorUpper.Equals("GHOSTWHITE")) return VTKnownColor.GhostWhite;
+                                if (colorUpper.Equals("GHOSTWHITE")) return SKColors.GhostWhite;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LIGHTCORAL")) return VTKnownColor.LightCoral;
-                                if (colorUpper.Equals("LIGHTGREEN")) return VTKnownColor.LightGreen;
+                                if (colorUpper.Equals("LIGHTCORAL")) return SKColors.LightCoral;
+                                if (colorUpper.Equals("LIGHTGREEN")) return SKColors.LightGreen;
                                 break;
                             case 'M':
-                                if (colorUpper.Equals("MEDIUMBLUE")) return VTKnownColor.MediumBlue;
+                                if (colorUpper.Equals("MEDIUMBLUE")) return SKColors.MediumBlue;
                                 break;
                             case 'P':
-                                if (colorUpper.Equals("PAPAYAWHIP")) return VTKnownColor.PapayaWhip;
-                                if (colorUpper.Equals("POWDERBLUE")) return VTKnownColor.PowderBlue;
+                                if (colorUpper.Equals("PAPAYAWHIP")) return SKColors.PapayaWhip;
+                                if (colorUpper.Equals("POWDERBLUE")) return SKColors.PowderBlue;
                                 break;
                             case 'S':
-                                if (colorUpper.Equals("SANDYBROWN")) return VTKnownColor.SandyBrown;
+                                if (colorUpper.Equals("SANDYBROWN")) return SKColors.SandyBrown;
                                 break;
                             case 'W':
-                                if (colorUpper.Equals("WHITESMOKE")) return VTKnownColor.WhiteSmoke;
+                                if (colorUpper.Equals("WHITESMOKE")) return SKColors.WhiteSmoke;
                                 break;
                         }
                         break;
@@ -457,32 +457,32 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'D':
-                                if (colorUpper.Equals("DARKMAGENTA")) return VTKnownColor.DarkMagenta;
-                                if (colorUpper.Equals("DEEPSKYBLUE")) return VTKnownColor.DeepSkyBlue;
+                                if (colorUpper.Equals("DARKMAGENTA")) return SKColors.DarkMagenta;
+                                if (colorUpper.Equals("DEEPSKYBLUE")) return SKColors.DeepSkyBlue;
                                 break;
                             case 'F':
-                                if (colorUpper.Equals("FLORALWHITE")) return VTKnownColor.FloralWhite;
-                                if (colorUpper.Equals("FORESTGREEN")) return VTKnownColor.ForestGreen;
+                                if (colorUpper.Equals("FLORALWHITE")) return SKColors.FloralWhite;
+                                if (colorUpper.Equals("FORESTGREEN")) return SKColors.ForestGreen;
                                 break;
                             case 'G':
-                                if (colorUpper.Equals("GREENYELLOW")) return VTKnownColor.GreenYellow;
+                                if (colorUpper.Equals("GREENYELLOW")) return SKColors.GreenYellow;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LIGHTSALMON")) return VTKnownColor.LightSalmon;
-                                if (colorUpper.Equals("LIGHTYELLOW")) return VTKnownColor.LightYellow;
+                                if (colorUpper.Equals("LIGHTSALMON")) return SKColors.LightSalmon;
+                                if (colorUpper.Equals("LIGHTYELLOW")) return SKColors.LightYellow;
                                 break;
                             case 'N':
-                                if (colorUpper.Equals("NAVAJOWHITE")) return VTKnownColor.NavajoWhite;
+                                if (colorUpper.Equals("NAVAJOWHITE")) return SKColors.NavajoWhite;
                                 break;
                             case 'S':
-                                if (colorUpper.Equals("SADDLEBROWN")) return VTKnownColor.SaddleBrown;
-                                if (colorUpper.Equals("SPRINGGREEN")) return VTKnownColor.SpringGreen;
+                                if (colorUpper.Equals("SADDLEBROWN")) return SKColors.SaddleBrown;
+                                if (colorUpper.Equals("SPRINGGREEN")) return SKColors.SpringGreen;
                                 break;
                             case 'T':
-                                if (colorUpper.Equals("TRANSPARENT")) return VTKnownColor.Transparent;
+                                if (colorUpper.Equals("TRANSPARENT")) return SKColors.Transparent;
                                 break;
                             case 'Y':
-                                if (colorUpper.Equals("YELLOWGREEN")) return VTKnownColor.YellowGreen;
+                                if (colorUpper.Equals("YELLOWGREEN")) return SKColors.YellowGreen;
                                 break;
                         }
                         break;
@@ -490,19 +490,19 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'A':
-                                if (colorUpper.Equals("ANTIQUEWHITE")) return VTKnownColor.AntiqueWhite;
+                                if (colorUpper.Equals("ANTIQUEWHITE")) return SKColors.AntiqueWhite;
                                 break;
                             case 'D':
-                                if (colorUpper.Equals("DARKSEAGREEN")) return VTKnownColor.DarkSeaGreen;
+                                if (colorUpper.Equals("DARKSEAGREEN")) return SKColors.DarkSeaGreen;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LIGHTSKYBLUE")) return VTKnownColor.LightSkyBlue;
-                                if (colorUpper.Equals("LEMONCHIFFON")) return VTKnownColor.LemonChiffon;
+                                if (colorUpper.Equals("LIGHTSKYBLUE")) return SKColors.LightSkyBlue;
+                                if (colorUpper.Equals("LEMONCHIFFON")) return SKColors.LemonChiffon;
                                 break;
                             case 'M':
-                                if (colorUpper.Equals("MEDIUMORCHID")) return VTKnownColor.MediumOrchid;
-                                if (colorUpper.Equals("MEDIUMPURPLE")) return VTKnownColor.MediumPurple;
-                                if (colorUpper.Equals("MIDNIGHTBLUE")) return VTKnownColor.MidnightBlue;
+                                if (colorUpper.Equals("MEDIUMORCHID")) return SKColors.MediumOrchid;
+                                if (colorUpper.Equals("MEDIUMPURPLE")) return SKColors.MediumPurple;
+                                if (colorUpper.Equals("MIDNIGHTBLUE")) return SKColors.MidnightBlue;
                                 break;
                         }
                         break;
@@ -510,19 +510,19 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'D':
-                                if (colorUpper.Equals("DARKSLATEBLUE")) return VTKnownColor.DarkSlateBlue;
-                                if (colorUpper.Equals("DARKSLATEGRAY")) return VTKnownColor.DarkSlateGray;
-                                if (colorUpper.Equals("DARKGOLDENROD")) return VTKnownColor.DarkGoldenrod;
-                                if (colorUpper.Equals("DARKTURQUOISE")) return VTKnownColor.DarkTurquoise;
+                                if (colorUpper.Equals("DARKSLATEBLUE")) return SKColors.DarkSlateBlue;
+                                if (colorUpper.Equals("DARKSLATEGRAY")) return SKColors.DarkSlateGray;
+                                if (colorUpper.Equals("DARKGOLDENROD")) return SKColors.DarkGoldenrod;
+                                if (colorUpper.Equals("DARKTURQUOISE")) return SKColors.DarkTurquoise;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LIGHTSEAGREEN")) return VTKnownColor.LightSeaGreen;
-                                if (colorUpper.Equals("LAVENDERBLUSH")) return VTKnownColor.LavenderBlush;
+                                if (colorUpper.Equals("LIGHTSEAGREEN")) return SKColors.LightSeaGreen;
+                                if (colorUpper.Equals("LAVENDERBLUSH")) return SKColors.LavenderBlush;
                                 break;
                             case 'P':
-                                if (colorUpper.Equals("PALEGOLDENROD")) return VTKnownColor.PaleGoldenrod;
-                                if (colorUpper.Equals("PALETURQUOISE")) return VTKnownColor.PaleTurquoise;
-                                if (colorUpper.Equals("PALEVIOLETRED")) return VTKnownColor.PaleVioletRed;
+                                if (colorUpper.Equals("PALEGOLDENROD")) return SKColors.PaleGoldenrod;
+                                if (colorUpper.Equals("PALETURQUOISE")) return SKColors.PaleTurquoise;
+                                if (colorUpper.Equals("PALEVIOLETRED")) return SKColors.PaleVioletRed;
                                 break;
                         }
                         break;
@@ -530,58 +530,60 @@ namespace VectorTileRenderer
                         switch (colorUpper[0])
                         {
                             case 'B':
-                                if (colorUpper.Equals("BLANCHEDALMOND")) return VTKnownColor.BlanchedAlmond;
+                                if (colorUpper.Equals("BLANCHEDALMOND")) return SKColors.BlanchedAlmond;
                                 break;
                             case 'C':
-                                if (colorUpper.Equals("CORNFLOWERBLUE")) return VTKnownColor.CornflowerBlue;
+                                if (colorUpper.Equals("CORNFLOWERBLUE")) return SKColors.CornflowerBlue;
                                 break;
                             case 'D':
-                                if (colorUpper.Equals("DARKOLIVEGREEN")) return VTKnownColor.DarkOliveGreen;
+                                if (colorUpper.Equals("DARKOLIVEGREEN")) return SKColors.DarkOliveGreen;
                                 break;
                             case 'L':
-                                if (colorUpper.Equals("LIGHTSLATEGRAY")) return VTKnownColor.LightSlateGray;
-                                if (colorUpper.Equals("LIGHTSTEELBLUE")) return VTKnownColor.LightSteelBlue;
+                                if (colorUpper.Equals("LIGHTSLATEGRAY")) return SKColors.LightSlateGray;
+                                if (colorUpper.Equals("LIGHTSTEELBLUE")) return SKColors.LightSteelBlue;
                                 break;
                             case 'M':
-                                if (colorUpper.Equals("MEDIUMSEAGREEN")) return VTKnownColor.MediumSeaGreen;
+                                if (colorUpper.Equals("MEDIUMSEAGREEN")) return SKColors.MediumSeaGreen;
                                 break;
                         }
                         break;
                     case 15:
-                        if (colorUpper.Equals("MEDIUMSLATEBLUE")) return VTKnownColor.MediumSlateBlue;
-                        if (colorUpper.Equals("MEDIUMTURQUOISE")) return VTKnownColor.MediumTurquoise;
-                        if (colorUpper.Equals("MEDIUMVIOLETRED")) return VTKnownColor.MediumVioletRed;
+                        if (colorUpper.Equals("MEDIUMSLATEBLUE")) return SKColors.MediumSlateBlue;
+                        if (colorUpper.Equals("MEDIUMTURQUOISE")) return SKColors.MediumTurquoise;
+                        if (colorUpper.Equals("MEDIUMVIOLETRED")) return SKColors.MediumVioletRed;
                         break;
                     case 16:
-                        if (colorUpper.Equals("MEDIUMAQUAMARINE")) return VTKnownColor.MediumAquamarine;
+                        if (colorUpper.Equals("MEDIUMAQUAMARINE")) return SKColors.MediumAquamarine;
                         break;
                     case 17:
-                        if (colorUpper.Equals("MEDIUMSPRINGGREEN")) return VTKnownColor.MediumSpringGreen;
+                        if (colorUpper.Equals("MEDIUMSPRINGGREEN")) return SKColors.MediumSpringGreen;
                         break;
                     case 20:
-                        if (colorUpper.Equals("LIGHTGOLDENRODYELLOW")) return VTKnownColor.LightGoldenrodYellow;
+                        if (colorUpper.Equals("LIGHTGOLDENRODYELLOW")) return SKColors.LightGoldenrodYellow;
                         break;
                 }
             }
             // colorString was null or not found
-            return VTKnownColor.UnknownColor;
+            return SKColors.Transparent;
         }
 
-        internal static VTKnownColor ArgbStringToKnownColor(string argbString)
+        internal static SKColor ArgbStringToKnownColor(string argbString)
         {
             string argbUpper = argbString.Trim().ToUpper(System.Globalization.CultureInfo.InvariantCulture);
 
-            VTKnownColor color;
-            if (s_knownArgbColors.TryGetValue(argbUpper, out color))
+            if (s_knownArgbColors.TryGetValue(argbUpper, out SKColor color))
+            {
                 return color;
+            }
 
-            return VTKnownColor.UnknownColor;
+            return SKColors.Transparent;
         }
+
 #if DEBUG
         private static int s_count = 0;
 #endif
 
         //private static Dictionary<uint, SolidColorBrush> s_solidColorBrushCache = new Dictionary<uint, SolidColorBrush>();
-        private static Dictionary<string, VTKnownColor> s_knownArgbColors = new Dictionary<string, VTKnownColor>();
+        private static Dictionary<string, SKColor> s_knownArgbColors = new Dictionary<string, SKColor>();
     }
 }

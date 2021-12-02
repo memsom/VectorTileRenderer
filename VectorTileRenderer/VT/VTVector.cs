@@ -64,6 +64,10 @@ namespace VectorTileRenderer
             return new VTPoint(v.X, v.Y);
         }
 
+        public override string ToString()
+        {
+            return $"{X},{Y}";
+        }
     }
 
 }

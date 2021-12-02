@@ -53,7 +53,7 @@ namespace VectorTileRenderer
 
         public void DrawBackground(Brush style)
         {
-            var color = new SKColor(style.Paint.BackgroundColor.R, style.Paint.BackgroundColor.G, style.Paint.BackgroundColor.B, style.Paint.BackgroundColor.A);
+            var color = new SKColor(style.Paint.BackgroundColor.Red, style.Paint.BackgroundColor.Green, style.Paint.BackgroundColor.Blue, style.Paint.BackgroundColor.Alpha);
             canvas.Clear(color);
         }
 
@@ -194,7 +194,7 @@ namespace VectorTileRenderer
                 Style = SKPaintStyle.Stroke,
                 StrokeCap = ConvertCap(style.Paint.LineCap),
                 StrokeWidth = (float)style.Paint.LineWidth,
-                Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.LineOpacity, 0, 255)),
+                Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.LineOpacity, 0, 255)),
                 IsAntialias = true,
             };
 
@@ -235,7 +235,7 @@ namespace VectorTileRenderer
             {
                 IsStroke = true,
                 StrokeWidth = (float)style.Paint.TextStrokeWidth,
-                Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.TextOpacity, 0, 255)),
+                Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.TextOpacity, 0, 255)),
                 TextSize = (float)style.Paint.TextSize,
                 IsAntialias = true,
                 TextEncoding = SKTextEncoding.Utf32,
@@ -251,7 +251,7 @@ namespace VectorTileRenderer
             var color = style.Paint.TextColor;
             var paint = new SKPaint()
             {
-                Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.TextOpacity, 0, 255)),
+                Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.TextOpacity, 0, 255)),
                 TextSize = (float)style.Paint.TextSize,
                 IsAntialias = true,
                 TextEncoding = SKTextEncoding.Utf32,
@@ -503,7 +503,10 @@ namespace VectorTileRenderer
             double distance = 0;
             for (var i = 0; i < path.Count - 2; i++)
             {
-                distance += Subtract(path[i], path[i + 1]).Length;
+                var v = Subtract(path[i], path[i + 1]);
+                var length = v.Length;
+                System.Diagnostics.Debug.WriteLine($"GPL:: {path[i]} {path[i +1]} :: {v} :: {length}");
+                distance += length;
             }
 
             return distance;
@@ -550,7 +553,7 @@ namespace VectorTileRenderer
             //return maxCurve;
         }
 
-        void DebugRectangle(VTRect rectangle, Color color)
+        void DebugRectangle(VTRect rectangle, SKColor color)
         {
             var list = new List<VTPoint>()
             {
@@ -686,7 +689,7 @@ namespace VectorTileRenderer
                 {
                     Style = SKPaintStyle.Fill,
                     StrokeCap = ConvertCap(style.Paint.LineCap),
-                    Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.FillOpacity, 0, 255)),
+                    Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.FillOpacity, 0, 255)),
                     IsAntialias = true,
                 };
 
