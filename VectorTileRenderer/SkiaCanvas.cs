@@ -505,7 +505,7 @@ namespace VectorTileRenderer
             {
                 var v = Subtract(path[i], path[i + 1]);
                 var length = v.Length;
-                System.Diagnostics.Debug.WriteLine($"GPL:: {path[i]} {path[i +1]} :: {v} :: {length}");
+                //System.Diagnostics.Debug.WriteLine($"GPL:: {path[i]} {path[i +1]} :: {v} :: {length}");
                 distance += length;
             }
 
