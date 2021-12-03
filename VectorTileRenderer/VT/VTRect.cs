@@ -13,6 +13,14 @@ namespace VectorTileRenderer
             Height = height;
         }
 
+        public VTRect(VTPoint tl, VTPoint br) : this()
+        {
+            X = tl.X;
+            Y = tl.Y;
+            Width = br.X - tl.X;
+            Height = br.Y - tl.Y;
+        }
+
         public VTRect(VTPoint loc, Size sz) : this(loc.X, loc.Y, sz.Width, sz.Height)
         {
         }

@@ -172,7 +172,7 @@ namespace VectorTileRenderer.Sources
                 var newR = Utils.ConvertRange(southEast.X, biggerBounds.West, biggerBounds.East, 0, 1);
                 var newB = Utils.ConvertRange(southEast.Y, biggerBounds.North, biggerBounds.South, 0, 1);
 
-                extent = new VTRect(newL, newT, newR, newB);
+                extent = new VTRect(new VTPoint(newL, newT), new VTPoint(newR, newB));
                 //thisZoom = MaxZoom;
 
                 x = biggerTile.X;
