@@ -17,9 +17,7 @@ namespace Mapsui.Demo.WPF
             var point = new Point(8.542693, 47.368659);
             var sphericalPoint = SphericalMercator.FromLonLat(point.X, point.Y);
 
-            MyMapControl.Map.NavigateTo(sphericalPoint);
-            MyMapControl.Map.Viewport.Resolution = 12;
-            
+            MyMapControl.Navigator.NavigateTo(sphericalPoint, 12.0);
         }
 
 
@@ -31,7 +29,7 @@ namespace Mapsui.Demo.WPF
             var source = new VectorMbTilesSource(mainDir + @"tiles/zurich.mbtiles", mainDir + @"styles/" + styleName + "-style.json", mainDir + @"tile-cache/");
             MyMapControl.Map.Layers.Clear();
             MyMapControl.Map.Layers.Add(new TileLayer(source));
-            MyMapControl.Map.ViewChanged(true);
+            MyMapControl.Refresh();
         }
     }
 }
