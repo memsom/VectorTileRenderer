@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using Xamarin.Forms;
+
 
 namespace VectorTileRenderer.Sources
 {
@@ -52,7 +52,7 @@ namespace VectorTileRenderer.Sources
             return null;
         }
 
-        private async Task<VectorTile> UnzipStream(Stream stream)
+        async Task<VectorTile> UnzipStream(Stream stream)
         {
             if (IsGZipped(stream))
             {
@@ -70,7 +70,7 @@ namespace VectorTileRenderer.Sources
             }
         }
 
-        private async Task<VectorTile> LoadStream(Stream stream)
+        async Task<VectorTile> LoadStream(Stream stream)
         {
             var mbLayers = new Mapbox.VectorTile.VectorTile(ReadTillEnd(stream));
 
@@ -97,7 +97,7 @@ namespace VectorTileRenderer.Sources
             }
         }
 
-        private static async Task<VectorTile> BaseTileToVector(object baseTile)
+        static async Task<VectorTile> BaseTileToVector(object baseTile)
         {
             return await Task.Run(() =>
             {
@@ -120,18 +120,18 @@ namespace VectorTileRenderer.Sources
                         vectorFeature.GeometryType = ConvertGeometryType(feat.GeometryType);
                         vectorFeature.Attributes = feat.GetProperties();
 
-                        var vectorGeometry = new List<List<Point>>();
+                        var vectorGeometry = new List<List<VTPoint>>();
 
                         foreach (var points in feat.Geometry<int>())
                         {
-                            var vectorPoints = new List<Point>();
+                        var vectorPoints = new List<VTPoint>();
 
                             foreach (var coordinate in points)
                             {
                                 var dX = (double)coordinate.X / (double)lyr.Extent;
                                 var dY = (double)coordinate.Y / (double)lyr.Extent;
 
-                                vectorPoints.Add(new Point(dX, dY));
+                                vectorPoints.Add(new VTPoint(dX, dY));
 
                                 //var newX = Utils.ConvertRange(dX, extent.Left, extent.Right, 0, vectorFeature.Extent);
                                 //var newY = Utils.ConvertRange(dY, extent.Top, extent.Bottom, 0, vectorFeature.Extent);

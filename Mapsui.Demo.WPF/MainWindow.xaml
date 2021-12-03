@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mapsui.Demo.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
+        Title="MainWindow" Height="600" Width="800" WindowStartupLocation="CenterScreen" WindowState="Normal">
     <Grid>
 
         <xaml:MapControl Name="MyMapControl"></xaml:MapControl>

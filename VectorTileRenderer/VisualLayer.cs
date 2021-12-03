@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Xamarin.Forms;
 
 namespace VectorTileRenderer
 {
@@ -12,7 +11,7 @@ namespace VectorTileRenderer
 
         public VectorTileFeature VectorTileFeature { get; set; } = null;
 
-        public List<List<Point>> Geometry { get; set; } = null;
+        public List<List<VTPoint>> Geometry { get; set; } = null;
 
         public Brush Brush { get; set; } = null;
     }

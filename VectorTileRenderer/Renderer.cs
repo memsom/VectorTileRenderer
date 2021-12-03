@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Forms;
 
 namespace VectorTileRenderer
 {
@@ -14,7 +11,7 @@ namespace VectorTileRenderer
         // TODO make it instance based... maybe
         static object cacheLock = new object();
 
-        public async static Task<BitmapSource> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
+        public async static Task<byte[]> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
             string layerString = whiteListLayers == null ? "" : string.Join(",-", whiteListLayers.ToArray());
 
@@ -67,10 +64,12 @@ namespace VectorTileRenderer
                               }
 
                               using (var fileStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))
+                              using (var br = new BinaryWriter(fileStream))
                               {
-                                  BitmapEncoder encoder = new BitmapEncoder();
-                                  encoder.Add(BitmapFrame.Create(bitmap));
-                                  encoder.Save(fileStream);
+                                  br.Write(bitmap);
+                                  br.Flush();
+                                  br.Close();
+                                  fileStream.Close();
                               }
                           }
                       }
@@ -88,22 +87,12 @@ namespace VectorTileRenderer
             return bitmap;
         }
 
-        static BitmapSource LoadBitmap(string path)
+        static byte[] LoadBitmap(string path)
         {
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                var fsBitmap = new BitmapImage();
-                fsBitmap.BeginInit();
-                fsBitmap.StreamSource = stream;
-                fsBitmap.CacheOption = BitmapCacheOption.OnLoad;
-                fsBitmap.EndInit();
-                fsBitmap.Freeze();
-
-                return fsBitmap;
-            }
+            return File.ReadAllBytes(path);
         }
 
-        public async static Task<BitmapSource> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
+        public async static Task<byte[]> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
             Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
             Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
@@ -173,7 +162,7 @@ namespace VectorTileRenderer
                                             for (int i = 0; i < geometry.Count; i++)
                                             {
                                                 var point = geometry[i];
-                                                geometry[i] = new Point(point.X / feature.Extent * sizeX, point.Y / feature.Extent * sizeY);
+                                                geometry[i] = new VTPoint(point.X / feature.Extent * sizeX, point.Y / feature.Extent * sizeY);
                                             }
                                         }
                                     }
@@ -337,7 +326,8 @@ namespace VectorTileRenderer
                         else if (feature.GeometryType == "Unknown")
                         {
                             canvas.DrawUnknown(geometry, brush);
-                        } else
+                        }
+                        else
                         {
 
                         }
@@ -395,13 +385,13 @@ namespace VectorTileRenderer
             return canvas.FinishDrawing();
         }
 
-        private static List<List<Point>> localizeGeometry(List<List<Point>> coordinates, double sizeX, double sizeY, double extent)
+        static List<List<VTPoint>> LocalizeGeometry(List<List<VTPoint>> coordinates, double sizeX, double sizeY, double extent)
         {
             return coordinates.Select(list =>
             {
                 return list.Select(point =>
                 {
-                    Point newPoint = new Point(0, 0);
+                    VTPoint newPoint = new VTPoint(0, 0);
 
                     var x = Utils.ConvertRange(point.X, 0, extent, 0, sizeX, false);
                     var y = Utils.ConvertRange(point.Y, 0, extent, 0, sizeY, false);

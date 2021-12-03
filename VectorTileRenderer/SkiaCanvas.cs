@@ -1,18 +1,14 @@
 ﻿using ClipperLib;
 using SkiaSharp;
-using SkiaSharp.Views.Forms;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Text;
-using Xamarin.Forms;
 
 namespace VectorTileRenderer
 {
-
     public class SkiaCanvas : ICanvas
     {
         int width;
@@ -22,13 +18,13 @@ namespace VectorTileRenderer
         SKCanvas canvas;
 
         public bool ClipOverflow { get; set; } = false;
-        private Rect clipRectangle;
+        private VTRect clipRectangle;
         List<IntPoint> clipRectanglePath;
 
         ConcurrentDictionary<string, SKTypeface> fontPairs = new ConcurrentDictionary<string, SKTypeface>();
         private static readonly Object fontLock = new Object();
 
-        List<Rect> textRectangles = new List<Rect>();
+        List<VTRect> textRectangles = new List<VTRect>();
 
         public void StartDrawing(double width, double height)
         {
@@ -41,7 +37,7 @@ namespace VectorTileRenderer
             canvas = surface.Canvas;
 
             double padding = -5;
-            clipRectangle = new Rect(padding, padding, this.width - padding * 2, this.height - padding * 2);
+            clipRectangle = new VTRect(padding, padding, this.width - padding * 2, this.height - padding * 2);
 
             clipRectanglePath = new List<IntPoint>
             {
@@ -55,16 +51,17 @@ namespace VectorTileRenderer
 
         public void DrawBackground(Brush style)
         {
-            canvas.Clear(style.Paint.BackgroundColor.ToSKColor());
+            var color = new SKColor(style.Paint.BackgroundColor.Red, style.Paint.BackgroundColor.Green, style.Paint.BackgroundColor.Blue, style.Paint.BackgroundColor.Alpha);
+            canvas.Clear(color);
         }
 
-        SKStrokeCap ConvertCap(PenLineCap cap)
+        SKStrokeCap ConvertCap(VTPenLineCap cap)
         {
-            if (cap == PenLineCap.Flat)
+            if (cap == VTPenLineCap.Flat)
             {
                 return SKStrokeCap.Butt;
             }
-            else if (cap == PenLineCap.Round)
+            else if (cap == VTPenLineCap.Round)
             {
                 return SKStrokeCap.Round;
             }
@@ -118,7 +115,7 @@ namespace VectorTileRenderer
             return Math.Max(min, Math.Min(max, number));
         }
 
-        List<List<Point>> ClipPolygon(List<Point> geometry) // may break polygons into multiple ones
+        List<List<VTPoint>> ClipPolygon(List<VTPoint> geometry) // may break polygons into multiple ones
         {
             var c = new Clipper();
 
@@ -139,19 +136,19 @@ namespace VectorTileRenderer
 
             if (success && solution.Count > 0)
             {
-                var result = solution.Select(s => s.Select(item => new Point(item.X, item.Y)).ToList()).ToList();
+                var result = solution.Select(s => s.Select(item => new VTPoint(item.X, item.Y)).ToList()).ToList();
                 return result;
             }
 
             return null;
         }
 
-        List<Point> ClipLine(List<Point> geometry)
+        List<VTPoint> ClipLine(List<VTPoint> geometry)
         {
             return LineClipper.ClipPolyline(geometry, clipRectangle);
         }
 
-        SKPath GetPathFromGeometry(List<Point> geometry)
+        SKPath GetPathFromGeometry(List<VTPoint> geometry)
         {
 
             SKPath path = new SKPath
@@ -171,7 +168,7 @@ namespace VectorTileRenderer
             return path;
         }
 
-        public void DrawLineString(List<Point> geometry, Brush style)
+        public void DrawLineString(List<VTPoint> geometry, Brush style)
         {
             if (ClipOverflow)
             {
@@ -188,14 +185,14 @@ namespace VectorTileRenderer
                 return;
             }
 
-            var color = (System.Drawing.Color)style.Paint.LineColor;
+            var color = style.Paint.LineColor;
 
             SKPaint fillPaint = new SKPaint
             {
                 Style = SKPaintStyle.Stroke,
                 StrokeCap = ConvertCap(style.Paint.LineCap),
                 StrokeWidth = (float)style.Paint.LineWidth,
-                Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.LineOpacity, 0, 255)),
+                Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.LineOpacity, 0, 255)),
                 IsAntialias = true,
             };
 
@@ -210,17 +207,17 @@ namespace VectorTileRenderer
             canvas.DrawPath(path, fillPaint);
         }
 
-        SKTextAlign ConvertAlignment(TextAlignment alignment)
+        SKTextAlign ConvertAlignment(VTTextAlignment alignment)
         {
-            if (alignment == TextAlignment.Center)
+            if (alignment == VTTextAlignment.Center)
             {
                 return SKTextAlign.Center;
             }
-            else if (alignment == TextAlignment.Start)
+            else if (alignment == VTTextAlignment.Left)
             {
                 return SKTextAlign.Left;
             }
-            else if (alignment == TextAlignment.End)
+            else if (alignment == VTTextAlignment.Right)
             {
                 return SKTextAlign.Right;
             }
@@ -230,13 +227,13 @@ namespace VectorTileRenderer
 
         SKPaint GetTextStrokePaint(Brush style)
         {
-            var color = (System.Drawing.Color)style.Paint.TextStrokeColor;
+            var color = style.Paint.TextStrokeColor;
 
             var paint = new SKPaint()
             {
                 IsStroke = true,
                 StrokeWidth = (float)style.Paint.TextStrokeWidth,
-                Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.TextOpacity, 0, 255)),
+                Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.TextOpacity, 0, 255)),
                 TextSize = (float)style.Paint.TextSize,
                 IsAntialias = true,
                 TextEncoding = SKTextEncoding.Utf32,
@@ -249,10 +246,10 @@ namespace VectorTileRenderer
 
         SKPaint GetTextPaint(Brush style)
         {
-            var color = (System.Drawing.Color)style.Paint.TextColor;
+            var color = style.Paint.TextColor;
             var paint = new SKPaint()
             {
-                Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.TextOpacity, 0, 255)),
+                Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.TextOpacity, 0, 255)),
                 TextSize = (float)style.Paint.TextSize,
                 IsAntialias = true,
                 TextEncoding = SKTextEncoding.Utf32,
@@ -271,11 +268,11 @@ namespace VectorTileRenderer
                 return string.Empty;
             }
 
-            if (style.Paint.TextTransform == TextTransform.Uppercase)
+            if (style.Paint.TextTransform == VTTextTransform.Uppercase)
             {
                 text = text.ToUpper();
             }
-            else if (style.Paint.TextTransform == TextTransform.Lowercase)
+            else if (style.Paint.TextTransform == VTTextTransform.Lowercase)
             {
                 text = text.ToLower();
             }
@@ -319,7 +316,7 @@ namespace VectorTileRenderer
             return brokenText.Trim();
         }
 
-        bool TextCollides(Rect rectangle)
+        bool TextCollides(VTRect rectangle)
         {
             foreach (var rect in textRectangles)
             {
@@ -420,7 +417,7 @@ namespace VectorTileRenderer
 
         }
 
-        public void DrawText(Point geometry, Brush style)
+        public void DrawText(VTPoint geometry, Brush style)
         {
             if (style.Paint.TextOptional)
             {
@@ -448,7 +445,7 @@ namespace VectorTileRenderer
                 int top = (int)(geometry.Y - style.Paint.TextSize / 2 * allLines.Length);
                 int height = (int)(style.Paint.TextSize * allLines.Length);
 
-                var rectangle = new Rect(left, top, width, height);
+                var rectangle = new VTRect(left, top, width, height);
                 rectangle.Inflate(5, 5);
 
                 if (ClipOverflow)
@@ -499,20 +496,23 @@ namespace VectorTileRenderer
 
         }
 
-        double GetPathLength(List<Point> path)
+        double GetPathLength(List<VTPoint> path)
         {
             double distance = 0;
             for (var i = 0; i < path.Count - 2; i++)
             {
-                distance += Subtract(path[i], path[i + 1]).Length;
+                var v = Subtract(path[i], path[i + 1]);
+                var length = v.Length;
+                //System.Diagnostics.Debug.WriteLine($"GPL:: {path[i]} {path[i +1]} :: {v} :: {length}");
+                distance += length;
             }
 
             return distance;
         }
 
-        public Vector Subtract(Point point1, Point point2)
+        public VTVector Subtract(VTPoint point1, VTPoint point2)
         {
-            return new Vector(point1.X - point2.X, point1.Y - point2.Y);
+            return new VTVector(point1.X - point2.X, point1.Y - point2.Y);
         }
 
         double GetAbsoluteDiff2Angles(double x, double y, double c = Math.PI)
@@ -520,7 +520,7 @@ namespace VectorTileRenderer
             return c - Math.Abs((Math.Abs(x - y) % 2 * c) - c);
         }
 
-        bool CheckPathSqueezing(List<Point> path, double textHeight)
+        bool CheckPathSqueezing(List<VTPoint> path, double textHeight)
         {
             //double maxCurve = 0;
             double previousAngle = 0;
@@ -551,14 +551,14 @@ namespace VectorTileRenderer
             //return maxCurve;
         }
 
-        void DebugRectangle(Rect rectangle, Color color)
+        void DebugRectangle(VTRect rectangle, SKColor color)
         {
-            var list = new List<Point>()
+            var list = new List<VTPoint>()
             {
-                new Point(rectangle.Top, rectangle.Left),
-                new Point(rectangle.Top, rectangle.Right),
-                new Point(rectangle.Bottom, rectangle.Right),
-                new Point(rectangle.Bottom, rectangle.Left),
+                new VTPoint(rectangle.Top, rectangle.Left),
+                new VTPoint(rectangle.Top, rectangle.Right),
+                new VTPoint(rectangle.Bottom, rectangle.Right),
+                new VTPoint(rectangle.Bottom, rectangle.Left),
             };
 
             var brush = new Brush
@@ -570,7 +570,7 @@ namespace VectorTileRenderer
             this.DrawPolygon(list, brush);
         }
 
-        public void DrawTextOnPath(List<Point> geometry, Brush style)
+        public void DrawTextOnPath(List<VTPoint> geometry, Brush style)
         {
             // buggggyyyyyy
             // requires an amazing collision system to work :/
@@ -605,7 +605,7 @@ namespace VectorTileRenderer
             var right = bounds.Right + style.Paint.TextSize;
             var bottom = bounds.Bottom + style.Paint.TextSize;
 
-            var rectangle = new Rect(left, top, right - left, bottom - top);
+            var rectangle = new VTRect(left, top, right - left, bottom - top);
 
             //if (rectangle.Left <= 0 || rectangle.Right >= width || rectangle.Top <= 0 || rectangle.Bottom >= height)
             //{
@@ -649,7 +649,7 @@ namespace VectorTileRenderer
             //canvas.DrawText(Encoding.UTF32.GetBytes(bending.ToString("F")), new SKPoint((float)left + 10, (float)top + 10), getTextPaint(style));
         }
 
-        public void DrawPoint(Point geometry, Brush style)
+        public void DrawPoint(VTPoint geometry, Brush style)
         {
             if (style.Paint.IconImage != null)
             {
@@ -657,16 +657,16 @@ namespace VectorTileRenderer
             }
         }
 
-        public void DrawPolygon(List<Point> geometry, Brush style)
+        public void DrawPolygon(List<VTPoint> geometry, Brush style)
         {
-            List<List<Point>> allGeometries = null;
+            List<List<VTPoint>> allGeometries = null;
             if (ClipOverflow)
             {
                 allGeometries = ClipPolygon(geometry);
             }
             else
             {
-                allGeometries = new List<List<Point>>() { geometry };
+                allGeometries = new List<List<VTPoint>>() { geometry };
             }
 
             if (allGeometries == null)
@@ -682,12 +682,12 @@ namespace VectorTileRenderer
                     return;
                 }
 
-                var color = (System.Drawing.Color)style.Paint.FillColor;
+                var color = style.Paint.FillColor;
                 SKPaint fillPaint = new SKPaint
                 {
                     Style = SKPaintStyle.Fill,
                     StrokeCap = ConvertCap(style.Paint.LineCap),
-                    Color = new SKColor(color.R, color.G, color.B, (byte)Clamp(color.A * style.Paint.FillOpacity, 0, 255)),
+                    Color = new SKColor(color.Red, color.Green, color.Blue, (byte)Clamp(color.Alpha * style.Paint.FillOpacity, 0, 255)),
                     IsAntialias = true,
                 };
 
@@ -696,85 +696,39 @@ namespace VectorTileRenderer
 
         }
 
-
-        //static SKImage ToSKImage(BitmapSource bitmap)
-        //{
-        //    // TODO: maybe keep the same color types where we can, instead of just going to the platform default
-        //    var info = new SKImageInfo(bitmap.PixelWidth, bitmap.PixelHeight);
-        //    var image = SKImage.Create(info);
-        //    using (var pixmap = image.PeekPixels())
-        //    {
-        //        ToSKPixmap(bitmap, pixmap);
-        //    }
-        //    return image;
-        //}
-
-        //static void ToSKPixmap(BitmapSource bitmap, SKPixmap pixmap)
-        //{
-        //    // TODO: maybe keep the same color types where we can, instead of just going to the platform default
-        //    if (pixmap.ColorType == SKImageInfo.PlatformColorType)
-        //    {
-        //        var info = pixmap.Info;
-        //        var converted = new FormatConvertedBitmap(bitmap, PixelFormats.Pbgra32, null, 0);
-        //        converted.CopyPixels(new Int32Rect(0, 0, info.Width, info.Height), pixmap.GetPixels(), info.BytesSize, info.RowBytes);
-        //    }
-        //    else
-        //    {
-        //        // we have to copy the pixels into a format that we understand
-        //        // and then into a desired format
-        //        // TODO: we can still do a bit more for other cases where the color types are the same
-        //        using (var tempImage = ToSKImage(bitmap))
-        //        {
-        //            tempImage.ReadPixels(pixmap, 0, 0);
-        //        }
-        //    }
-        //}
-
         public void DrawImage(Stream imageStream, Brush style)
         {
-            //var bitmapImage = new BitmapImage();
-            //bitmapImage.BeginInit();
-            //bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            //bitmapImage.StreamSource = imageStream;
-            //bitmapImage.DecodePixelWidth = this.width;
-            //bitmapImage.DecodePixelHeight = this.height;
-            //bitmapImage.EndInit();
+            try
+            {
+                if (imageStream.CanSeek && imageStream.Position != 0)
+                {
+                    imageStream.Seek(0, SeekOrigin.Begin);
+                }
 
-            //var image = toSKImage(bitmapImage);
-
-            //canvas.DrawImage(image, new SKPoint(0, 0));
+                var image = SKBitmap.Decode(imageStream);
+                canvas.DrawBitmap(image, new SKPoint(0, 0));
+            }
+            catch (Exception)
+            {
+                // something went wrong with the image format
+            }
         }
 
-        public void DrawUnknown(List<List<Point>> geometry, Brush style)
+        public void DrawUnknown(List<List<VTPoint>> geometry, Brush style)
         {
 
         }
 
-        //public BitmapSource FinishDrawing()
-        //{
-        //    //using (var paint = new SKPaint())
-        //    //{
-        //    //    paint.Color = new SKColor(255, 255, 255, 255);
-        //    //    paint.Style = SKPaintStyle.Fill;
-        //    //    paint.TextSize = 24;
-        //    //    paint.IsAntialias = true;
-
-        //    //    var bytes = Encoding.UTF32.GetBytes("HELLO WORLD");
-        //    //    canvas.DrawText(bytes, new SKPoint(10, 10), paint);
-        //    //}
-
-
-        //    //surface.Canvas.Flush();
-        //    //grContext.
-
-
-        //    bitmap.AddDirtyRect(new Int32Rect(0, 0, this.width, this.height));
-        //    bitmap.Unlock();
-        //    bitmap.Freeze();
-
-        //    return bitmap;
-
-        //}
+        public byte[] FinishDrawing()
+        {
+            using (var image = surface.Snapshot())
+            using (var data = image.Encode(SKEncodedImageFormat.Png, 80))
+            using (var result = new MemoryStream())
+            {
+                data.SaveTo(result);
+                return result.ToArray();
+            }
+        }
     }
 }
 
