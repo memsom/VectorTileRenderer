@@ -622,7 +622,7 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("hsla("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-				
+                
                 double h = double.Parse(segments[1], culture);
                 double s = double.Parse(segments[2], culture);
                 double l = double.Parse(segments[3], culture);
@@ -634,7 +634,7 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("rgba("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-				
+                
                 double r = double.Parse(segments[1], culture);
                 double g = double.Parse(segments[2], culture);
                 double b = double.Parse(segments[3], culture);
