@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 
 namespace VectorTileRenderer
 {
     static class LineClipper
     {
-        private static OutCode ComputeOutCode(double x, double y, VTRect r)
+        static OutCode ComputeOutCode(double x, double y, VTRect r)
         {
             var code = OutCode.Inside;
 
@@ -19,9 +18,9 @@ namespace VectorTileRenderer
             return code;
         }
 
-        private static OutCode ComputeOutCode(VTPoint p, VTRect r) { return ComputeOutCode(p.X, p.Y, r); }
+        static OutCode ComputeOutCode(VTPoint p, VTRect r) { return ComputeOutCode(p.X, p.Y, r); }
 
-        private static VTPoint CalculateIntersection(VTRect r, VTPoint p1, VTPoint p2, OutCode clipTo)
+        static VTPoint CalculateIntersection(VTRect r, VTPoint p1, VTPoint p2, OutCode clipTo)
         {
             var dx = (p2.X - p1.X);
             var dy = (p2.Y - p1.Y);

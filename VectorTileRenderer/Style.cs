@@ -3,7 +3,7 @@ using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -264,10 +264,12 @@ namespace VectorTileRenderer
             var layoutData = layer.Layout;
             var index = layer.Index;
 
-            var brush = new Brush();
-            brush.ZIndex = index;
-            brush.Layer = layer;
-            brush.GlyphsDirectory = this.FontDirectory;
+            var brush = new Brush
+            {
+                ZIndex = index,
+                Layer = layer,
+                GlyphsDirectory = this.FontDirectory
+            };
 
             var paint = new Paint();
             brush.Paint = paint;
@@ -581,9 +583,11 @@ namespace VectorTileRenderer
 
         SKColor ParseColor(object iColor)
         {
-            if (iColor.GetType() == typeof(Color))
+            var culture = new CultureInfo("en-US", true);
+
+            if (iColor.GetType() == typeof(System.Drawing.Color))
             {
-                var color = (Color)iColor;
+                var color = (System.Drawing.Color)iColor;
                 return new SKColor(color.R, color.G, color.B, color.A);
             }
 
@@ -601,16 +605,16 @@ namespace VectorTileRenderer
 
             if (colorString[0] == '#')
             {
-                //var color = VTKnownColors.ColorStringToKnownColor(colorString);
                 return SKColor.Parse(colorString);
             }
 
             if (colorString.StartsWith("hsl("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double h = double.Parse(segments[1]);
-                double s = double.Parse(segments[2]);
-                double l = double.Parse(segments[3]);
+                
+                double h = double.Parse(segments[1], culture);
+                double s = double.Parse(segments[2], culture);
+                double l = double.Parse(segments[3], culture);
 
                 return HSLAToColor(255, h, s, l);
             }
@@ -618,10 +622,11 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("hsla("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double h = double.Parse(segments[1]);
-                double s = double.Parse(segments[2]);
-                double l = double.Parse(segments[3]);
-                double a = double.Parse(segments[4]) * 255;
+                
+                double h = double.Parse(segments[1], culture);
+                double s = double.Parse(segments[2], culture);
+                double l = double.Parse(segments[3], culture);
+                double a = double.Parse(segments[4], culture) * 255;
 
                 return HSLAToColor(a, h, s, l);
             }
@@ -629,10 +634,11 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("rgba("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double r = double.Parse(segments[1]);
-                double g = double.Parse(segments[2]);
-                double b = double.Parse(segments[3]);
-                double a = double.Parse(segments[4]) * 255;
+                
+                double r = double.Parse(segments[1], culture);
+                double g = double.Parse(segments[2], culture);
+                double b = double.Parse(segments[3], culture);
+                double a = double.Parse(segments[4], culture) * 255;
 
                 return new SKColor((byte)r, (byte)g, (byte)b, (byte)a);
             }
@@ -640,9 +646,9 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("rgb("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                double r = double.Parse(segments[1]);
-                double g = double.Parse(segments[2]);
-                double b = double.Parse(segments[3]);
+                double r = double.Parse(segments[1], culture);
+                double g = double.Parse(segments[2], culture);
+                double b = double.Parse(segments[3], culture);
 
                 return new SKColor((byte)r, (byte)g, (byte)b, 255);
             }

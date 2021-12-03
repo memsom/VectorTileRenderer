@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
-using System.Windows;
+
 
 namespace VectorTileRenderer.Sources
 {
@@ -25,11 +25,14 @@ namespace VectorTileRenderer.Sources
 
         public async Task<Stream> GetTile(int x, int y, int zoom)
         {
-            var qualifiedPath = Path
-                .Replace("{x}", x.ToString())
-                .Replace("{y}", y.ToString())
-                .Replace("{z}", zoom.ToString());
-            return File.Open(qualifiedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return await Task.Run(() =>
+            {
+                var qualifiedPath = Path
+                    .Replace("{x}", x.ToString())
+                    .Replace("{y}", y.ToString())
+                    .Replace("{z}", zoom.ToString());
+                return File.Open(qualifiedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            });
         }
         
         public async Task<VectorTile> GetVectorTile(int x, int y, int zoom)
@@ -38,113 +41,119 @@ namespace VectorTileRenderer.Sources
             {
                 using (var stream = await GetTile(x, y, zoom))
                 {
-                    return await unzipStream(stream);
+                    return await UnzipStream(stream);
                 }
-            } else if (Stream != null)
+            }
+            else if (Stream != null)
             {
-                return  await unzipStream(Stream);
+                return await UnzipStream(Stream);
             }
 
             return null;
         }
 
-        private async Task<VectorTile> unzipStream(Stream stream)
+        async Task<VectorTile> UnzipStream(Stream stream)
         {
-            if (isGZipped(stream))
+            if (IsGZipped(stream))
             {
                 using (var zipStream = new GZipStream(stream, CompressionMode.Decompress))
                 using (var resultStream = new MemoryStream())
                 {
                     zipStream.CopyTo(resultStream);
                     resultStream.Seek(0, SeekOrigin.Begin);
-                    return await loadStream(resultStream);
+                    return await LoadStream(resultStream);
                 }
             }
             else
             {
-                return await loadStream(stream);
+                return await LoadStream(stream);
             }
         }
         
-        private async Task<VectorTile> loadStream(Stream stream)
+        async Task<VectorTile> LoadStream(Stream stream)
         {
-            var mbLayers = new Mapbox.VectorTile.VectorTile(readTillEnd(stream));
+            var mbLayers = new Mapbox.VectorTile.VectorTile(ReadTillEnd(stream));
 
-            return await baseTileToVector(mbLayers);
+            return await BaseTileToVector(mbLayers);
         }
 
-        static string convertGeometryType(GeomType type)
+        static string ConvertGeometryType(GeomType type)
         {
             if (type == GeomType.LINESTRING)
             {
                 return "LineString";
-            } else if (type == GeomType.POINT)
+            }
+            else if (type == GeomType.POINT)
             {
                 return "Point";
             }
             else if (type == GeomType.POLYGON)
             {
                 return "Polygon";
-            } else
+            }
+            else
             {
                 return "Unknown";
             }
         }
 
-        private static async Task<VectorTile> baseTileToVector(object baseTile)
+        static async Task<VectorTile> BaseTileToVector(object baseTile)
         {
-            var tile = baseTile as Mapbox.VectorTile.VectorTile;
-            var result = new VectorTile();
-
-            foreach (var lyrName in tile.LayerNames())
+            return await Task.Run(() =>
             {
-                Mapbox.VectorTile.VectorTileLayer lyr = tile.GetLayer(lyrName);
+                var tile = baseTile as Mapbox.VectorTile.VectorTile;
+                var result = new VectorTile();
 
-                var vectorLayer = new VectorTileLayer();
-                vectorLayer.Name = lyrName;
-
-                for (int i = 0; i < lyr.FeatureCount(); i++)
+                foreach (var lyrName in tile.LayerNames())
                 {
-                    Mapbox.VectorTile.VectorTileFeature feat = lyr.GetFeature(i);
+                    Mapbox.VectorTile.VectorTileLayer lyr = tile.GetLayer(lyrName);
 
-                    var vectorFeature = new VectorTileFeature();
-                    vectorFeature.Extent = 1;
-                    vectorFeature.GeometryType = convertGeometryType(feat.GeometryType);
-                    vectorFeature.Attributes = feat.GetProperties();
+                    var vectorLayer = new VectorTileLayer();
+                    vectorLayer.Name = lyrName;
 
-                    var vectorGeometry = new List<List<VTPoint>>();
-
-                    foreach (var points in feat.Geometry<int>())
+                    for (int i = 0; i < lyr.FeatureCount(); i++)
                     {
+                        Mapbox.VectorTile.VectorTileFeature feat = lyr.GetFeature(i);
+
+                        var vectorFeature = new VectorTileFeature();
+                        vectorFeature.Extent = 1;
+                        vectorFeature.GeometryType = ConvertGeometryType(feat.GeometryType);
+                        vectorFeature.Attributes = feat.GetProperties();
+
+                        var vectorGeometry = new List<List<VTPoint>>();
+
+                        foreach (var points in feat.Geometry<int>())
+                        {
                         var vectorPoints = new List<VTPoint>();
 
-                        foreach (var coordinate in points)
-                        {
-                            var dX = (double)coordinate.X / (double)lyr.Extent;
-                            var dY = (double)coordinate.Y / (double)lyr.Extent;
+                            foreach (var coordinate in points)
+                            {
+                                var dX = (double)coordinate.X / (double)lyr.Extent;
+                                var dY = (double)coordinate.Y / (double)lyr.Extent;
 
-                            vectorPoints.Add(new VTPoint(dX, dY));
+                                vectorPoints.Add(new VTPoint(dX, dY));
 
-                            //var newX = Utils.ConvertRange(dX, extent.Left, extent.Right, 0, vectorFeature.Extent);
-                            //var newY = Utils.ConvertRange(dY, extent.Top, extent.Bottom, 0, vectorFeature.Extent);
+                                //var newX = Utils.ConvertRange(dX, extent.Left, extent.Right, 0, vectorFeature.Extent);
+                                //var newY = Utils.ConvertRange(dY, extent.Top, extent.Bottom, 0, vectorFeature.Extent);
 
-                            //vectorPoints.Add(new Point(newX, newY));
+                                //vectorPoints.Add(new Point(newX, newY));
+                            }
+
+                            vectorGeometry.Add(vectorPoints);
                         }
 
-                        vectorGeometry.Add(vectorPoints);
+                        vectorFeature.Geometry = vectorGeometry;
+                        vectorLayer.Features.Add(vectorFeature);
                     }
 
-                    vectorFeature.Geometry = vectorGeometry;
-                    vectorLayer.Features.Add(vectorFeature);
+                    result.Layers.Add(vectorLayer);
                 }
 
-                result.Layers.Add(vectorLayer);
-            }
-
-            return result;
+                return result;
+            });
         }
         
-        byte[] readTillEnd(Stream input)
+        byte[] ReadTillEnd(Stream input)
         {
             byte[] buffer = new byte[16 * 1024];
             using (MemoryStream ms = new MemoryStream())
@@ -158,12 +167,12 @@ namespace VectorTileRenderer.Sources
             }
         }
 
-        bool isGZipped(Stream stream)
+        bool IsGZipped(Stream stream)
         {
-            return isZipped(stream, 3, "1F-8B-08");
+            return IsZipped(stream, 3, "1F-8B-08");
         }
 
-        bool isZipped(Stream stream, int signatureSize = 4, string expectedSignature = "50-4B-03-04")
+        bool IsZipped(Stream stream, int signatureSize = 4, string expectedSignature = "50-4B-03-04")
         {
             if (stream.Length < signatureSize)
                 return false;

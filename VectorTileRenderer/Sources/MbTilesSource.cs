@@ -22,9 +22,9 @@ namespace VectorTileRenderer.Sources
 
         ConcurrentDictionary<string, VectorTile> tileCache = new ConcurrentDictionary<string, VectorTile>();
 
-        private GlobalMercator gmt = new GlobalMercator();
+        readonly GlobalMercator gmt = new GlobalMercator();
 
-        SQLiteConnection sharedConnection;
+        readonly SQLiteConnection sharedConnection;
 
 
         public MbTilesSource(string path)
@@ -37,7 +37,8 @@ namespace VectorTileRenderer.Sources
             LoadMetadata();
         }
 
-        private void LoadMetadata()
+        // converted to use Sqlite-Net
+        void LoadMetadata()
         {
             try
             {

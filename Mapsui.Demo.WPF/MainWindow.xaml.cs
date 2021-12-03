@@ -31,7 +31,8 @@ namespace Mapsui.Demo.WPF
             var sphericalPoint = SphericalMercator.FromLonLat(point.X, point.Y);
 
             MyMapControl.Map.NavigateTo(sphericalPoint);
-            MyMapControl.Map.Viewport.Resolution = 2;
+            MyMapControl.Map.Viewport.Resolution = 12;
+            
         }
 
 

@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VectorTileReader", "Mapbox.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionMethods", "Mapbox.VectorTiles\ExtensionMethods\ExtensionMethods.csproj", "{F65D30F5-2FEB-45AA-B30E-2AC529107834}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ColorMinePortable", "ColorMinePortable\ColorMinePortable.csproj", "{A9185079-D3A2-4504-BAE6-1CBA57902C2F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,16 +88,6 @@ Global
 		{F65D30F5-2FEB-45AA-B30E-2AC529107834}.NativeDebug|Any CPU.Build.0 = Debug|Any CPU
 		{F65D30F5-2FEB-45AA-B30E-2AC529107834}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F65D30F5-2FEB-45AA-B30E-2AC529107834}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.DebugUI|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.DebugUI|Any CPU.Build.0 = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.Debug-uid-hack|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.Debug-uid-hack|Any CPU.Build.0 = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.NativeDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.NativeDebug|Any CPU.Build.0 = Debug|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9185079-D3A2-4504-BAE6-1CBA57902C2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
