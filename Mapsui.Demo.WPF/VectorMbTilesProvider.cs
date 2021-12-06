@@ -1,6 +1,8 @@
 ﻿using BruTile;
 using System;
-using VectorTileRenderer;
+using AliFlex.VectorTileRenderer;
+using AliFlex.VectorTileRenderer.Sources;
+using AliFlex.VectorTileRenderer.Enums;
 
 namespace Mapsui.Demo.WPF
 {
@@ -8,7 +10,7 @@ namespace Mapsui.Demo.WPF
     {
 
         VectorStyle style;
-        VectorTileRenderer.Sources.MbTilesSource provider;
+        MbTilesSource provider;
         string cachePath;
 
         public VectorMbTilesProvider(string path, string cachePath, VectorStyleKind kind, string customStyle = default)
@@ -19,7 +21,7 @@ namespace Mapsui.Demo.WPF
                 CustomStyle = customStyle
             };
 
-            provider = new VectorTileRenderer.Sources.MbTilesSource(path);
+            provider = new MbTilesSource(path);
             style.SetSourceProvider("openmaptiles", provider);
         }
         

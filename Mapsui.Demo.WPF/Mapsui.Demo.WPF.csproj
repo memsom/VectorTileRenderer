@@ -197,9 +197,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VectorTileRenderer\VectorTileRenderer.csproj">
+    <ProjectReference Include="..\VectorTileRenderer\AliFlux.VectorTileRenderer.csproj">
       <Project>{46423799-3b17-4e62-b0ab-5c5a13ee9eb2}</Project>
-      <Name>VectorTileRenderer</Name>
+      <Name>AliFlux.VectorTileRenderer</Name>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>

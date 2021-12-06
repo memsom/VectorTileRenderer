@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer.Drawing
 {
     // based on Xamarin Forms
-    public struct VTVector
+    public struct Vector
     {
-        public VTVector(double x, double y)
+        public Vector(double x, double y)
             : this()
         {
             X = x;
             Y = y;
         }
 
-
-        public VTVector(VTPoint p)
+        public Vector(Point p)
             : this()
         {
             X = p.X;
             Y = p.Y;
         }
 
-        public VTVector(double angle)
+        public Vector(double angle)
             : this()
         {
             X = Math.Cos(Math.PI * angle / 180);
@@ -40,7 +39,7 @@ namespace VectorTileRenderer
             get { return Math.Sqrt(LengthSquared); }
         }
 
-        public VTVector Normalized
+        public Vector Normalized
         {
             get
             {
@@ -48,20 +47,20 @@ namespace VectorTileRenderer
 
                 if (length != 0)
                 {
-                    return new VTVector(X / length, Y / length);
+                    return new Vector(X / length, Y / length);
                 }
-                return new VTVector();
+                return new Vector();
             }
         }
 
-        public static double AngleBetween(VTVector v1, VTVector v2)
+        public static double AngleBetween(Vector v1, Vector v2)
         {
             return 180 * (Math.Atan2(v2.Y, v2.X) - Math.Atan2(v1.Y, v1.X)) / Math.PI;
         }
 
-        public static explicit operator VTPoint(VTVector v)
+        public static explicit operator Point(Vector v)
         {
-            return new VTPoint(v.X, v.Y);
+            return new Point(v.X, v.Y);
         }
 
         public override string ToString()

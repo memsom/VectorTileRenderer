@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{6826C9A4-6E87-47E2-A628-DA804DE9F258}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VectorTileRenderer", "VectorTileRenderer\VectorTileRenderer.csproj", "{46423799-3B17-4E62-B0AB-5C5A13EE9EB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AliFlux.VectorTileRenderer", "VectorTileRenderer\AliFlux.VectorTileRenderer.csproj", "{46423799-3B17-4E62-B0AB-5C5A13EE9EB2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapsui.Demo.WPF", "Mapsui.Demo.WPF\Mapsui.Demo.WPF.csproj", "{3B10B84B-6803-4F4F-872D-D744E27FFA15}"
 EndProject

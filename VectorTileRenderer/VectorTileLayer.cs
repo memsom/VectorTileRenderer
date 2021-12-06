@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     public class VectorTileLayer
     {

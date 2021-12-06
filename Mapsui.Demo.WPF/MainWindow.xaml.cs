@@ -1,10 +1,10 @@
-﻿using Mapsui.Layers;
+﻿using AliFlex.VectorTileRenderer.Enums;
+using Mapsui.Layers;
 using Mapsui.Projection;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using VectorTileRenderer;
 
 namespace Mapsui.Demo.WPF
 {

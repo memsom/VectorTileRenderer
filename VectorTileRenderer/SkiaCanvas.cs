@@ -1,4 +1,6 @@
-﻿using ClipperLib;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using AliFlex.VectorTileRenderer.Enums;
+using ClipperLib;
 using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
@@ -7,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     public class SkiaCanvas : ICanvas
     {
@@ -18,13 +20,13 @@ namespace VectorTileRenderer
         SKCanvas canvas;
 
         public bool ClipOverflow { get; set; } = false;
-        private VTRect clipRectangle;
+        private Rect clipRectangle;
         List<IntPoint> clipRectanglePath;
 
         ConcurrentDictionary<string, SKTypeface> fontPairs = new ConcurrentDictionary<string, SKTypeface>();
         private static readonly Object fontLock = new Object();
 
-        List<VTRect> textRectangles = new List<VTRect>();
+        List<Rect> textRectangles = new List<Rect>();
 
         public void StartDrawing(double width, double height)
         {
@@ -37,7 +39,7 @@ namespace VectorTileRenderer
             canvas = surface.Canvas;
 
             double padding = -5;
-            clipRectangle = new VTRect(padding, padding, this.width - padding * 2, this.height - padding * 2);
+            clipRectangle = new Rect(padding, padding, this.width - padding * 2, this.height - padding * 2);
 
             clipRectanglePath = new List<IntPoint>
             {
@@ -49,19 +51,19 @@ namespace VectorTileRenderer
 
         }
 
-        public void DrawBackground(VTBrush style)
+        public void DrawBackground(Brush style)
         {
             var color = new SKColor(style.Paint.BackgroundColor.Red, style.Paint.BackgroundColor.Green, style.Paint.BackgroundColor.Blue, style.Paint.BackgroundColor.Alpha);
             canvas.Clear(color);
         }
 
-        SKStrokeCap ConvertCap(VTPenLineCap cap)
+        SKStrokeCap ConvertCap(PenLineCap cap)
         {
-            if (cap == VTPenLineCap.Flat)
+            if (cap == PenLineCap.Flat)
             {
                 return SKStrokeCap.Butt;
             }
-            else if (cap == VTPenLineCap.Round)
+            else if (cap == PenLineCap.Round)
             {
                 return SKStrokeCap.Round;
             }
@@ -115,7 +117,7 @@ namespace VectorTileRenderer
             return Math.Max(min, Math.Min(max, number));
         }
 
-        List<List<VTPoint>> ClipPolygon(List<VTPoint> geometry) // may break polygons into multiple ones
+        List<List<Point>> ClipPolygon(List<Point> geometry) // may break polygons into multiple ones
         {
             var c = new Clipper();
 
@@ -136,19 +138,19 @@ namespace VectorTileRenderer
 
             if (success && solution.Count > 0)
             {
-                var result = solution.Select(s => s.Select(item => new VTPoint(item.X, item.Y)).ToList()).ToList();
+                var result = solution.Select(s => s.Select(item => new Point(item.X, item.Y)).ToList()).ToList();
                 return result;
             }
 
             return null;
         }
 
-        List<VTPoint> ClipLine(List<VTPoint> geometry)
+        List<Point> ClipLine(List<Point> geometry)
         {
             return LineClipper.ClipPolyline(geometry, clipRectangle);
         }
 
-        SKPath GetPathFromGeometry(List<VTPoint> geometry)
+        SKPath GetPathFromGeometry(List<Point> geometry)
         {
 
             SKPath path = new SKPath
@@ -168,7 +170,7 @@ namespace VectorTileRenderer
             return path;
         }
 
-        public void DrawLineString(List<VTPoint> geometry, VTBrush style)
+        public void DrawLineString(List<Point> geometry, Brush style)
         {
             if (ClipOverflow)
             {
@@ -207,17 +209,17 @@ namespace VectorTileRenderer
             canvas.DrawPath(path, fillPaint);
         }
 
-        SKTextAlign ConvertAlignment(VTTextAlignment alignment)
+        SKTextAlign ConvertAlignment(TextAlignment alignment)
         {
-            if (alignment == VTTextAlignment.Center)
+            if (alignment == TextAlignment.Center)
             {
                 return SKTextAlign.Center;
             }
-            else if (alignment == VTTextAlignment.Left)
+            else if (alignment == TextAlignment.Left)
             {
                 return SKTextAlign.Left;
             }
-            else if (alignment == VTTextAlignment.Right)
+            else if (alignment == TextAlignment.Right)
             {
                 return SKTextAlign.Right;
             }
@@ -225,7 +227,7 @@ namespace VectorTileRenderer
             return SKTextAlign.Center;
         }
 
-        SKPaint GetTextStrokePaint(VTBrush style)
+        SKPaint GetTextStrokePaint(Brush style)
         {
             var color = style.Paint.TextStrokeColor;
 
@@ -244,7 +246,7 @@ namespace VectorTileRenderer
             return paint;
         }
 
-        SKPaint GetTextPaint(VTBrush style)
+        SKPaint GetTextPaint(Brush style)
         {
             var color = style.Paint.TextColor;
             var paint = new SKPaint()
@@ -261,18 +263,18 @@ namespace VectorTileRenderer
             return paint;
         }
 
-        string TransformText(string text, VTBrush style)
+        string TransformText(string text, Brush style)
         {
             if (text.Length == 0)
             {
                 return string.Empty;
             }
 
-            if (style.Paint.TextTransform == VTTextTransform.Uppercase)
+            if (style.Paint.TextTransform == TextTransform.Uppercase)
             {
                 text = text.ToUpper();
             }
-            else if (style.Paint.TextTransform == VTTextTransform.Lowercase)
+            else if (style.Paint.TextTransform == TextTransform.Lowercase)
             {
                 text = text.ToLower();
             }
@@ -284,7 +286,7 @@ namespace VectorTileRenderer
             //return Encoding.UTF32.GetBytes(newText);
         }
 
-        string BreakText(string input, SKPaint paint, VTBrush style)
+        string BreakText(string input, SKPaint paint, Brush style)
         {
             var restOfText = input;
             var brokenText = string.Empty;
@@ -316,7 +318,7 @@ namespace VectorTileRenderer
             return brokenText.Trim();
         }
 
-        bool TextCollides(VTRect rectangle)
+        bool TextCollides(Rect rectangle)
         {
             foreach (var rect in textRectangles)
             {
@@ -328,7 +330,7 @@ namespace VectorTileRenderer
             return false;
         }
 
-        SKTypeface GetFont(string[] familyNames, VTBrush style)
+        SKTypeface GetFont(string[] familyNames, Brush style)
         {
             lock (fontLock)
             {
@@ -393,7 +395,7 @@ namespace VectorTileRenderer
             return typeface;
         }
 
-        void QualifyTypeface(VTBrush style, SKPaint paint)
+        void QualifyTypeface(Brush style, SKPaint paint)
         {
             var glyphs = new ushort[paint.Typeface.CountGlyphs(style.Text)];
             if (glyphs.Length < style.Text.Length)
@@ -422,7 +424,7 @@ namespace VectorTileRenderer
 
         }
 
-        public void DrawText(VTPoint geometry, VTBrush style)
+        public void DrawText(Point geometry, Brush style)
         {
             if (style.Paint.TextOptional)
             {
@@ -450,7 +452,7 @@ namespace VectorTileRenderer
                 int top = (int)(geometry.Y - style.Paint.TextSize / 2 * allLines.Length);
                 int height = (int)(style.Paint.TextSize * allLines.Length);
 
-                var rectangle = new VTRect(left, top, width, height);
+                var rectangle = new Rect(left, top, width, height);
                 rectangle.Inflate(5, 5);
 
                 if (ClipOverflow)
@@ -500,7 +502,7 @@ namespace VectorTileRenderer
 
         }
 
-        double GetPathLength(List<VTPoint> path)
+        double GetPathLength(List<Point> path)
         {
             double distance = 0;
             for (var i = 0; i < path.Count - 2; i++)
@@ -513,9 +515,9 @@ namespace VectorTileRenderer
             return distance;
         }
 
-        public VTVector Subtract(VTPoint point1, VTPoint point2)
+        public Vector Subtract(Point point1, Point point2)
         {
-            return new VTVector(point1.X - point2.X, point1.Y - point2.Y);
+            return new Vector(point1.X - point2.X, point1.Y - point2.Y);
         }
 
         double GetAbsoluteDiff2Angles(double x, double y, double c = Math.PI)
@@ -523,7 +525,7 @@ namespace VectorTileRenderer
             return c - Math.Abs((Math.Abs(x - y) % 2 * c) - c);
         }
 
-        bool CheckPathSqueezing(List<VTPoint> path, double textHeight)
+        bool CheckPathSqueezing(List<Point> path, double textHeight)
         {
             //double maxCurve = 0;
             double previousAngle = 0;
@@ -554,26 +556,26 @@ namespace VectorTileRenderer
             //return maxCurve;
         }
 
-        void DebugRectangle(VTRect rectangle, SKColor color)
+        void DebugRectangle(Rect rectangle, SKColor color)
         {
-            var list = new List<VTPoint>()
+            var list = new List<Point>()
             {
-                new VTPoint(rectangle.Top, rectangle.Left),
-                new VTPoint(rectangle.Top, rectangle.Right),
-                new VTPoint(rectangle.Bottom, rectangle.Right),
-                new VTPoint(rectangle.Bottom, rectangle.Left),
+                new Point(rectangle.Top, rectangle.Left),
+                new Point(rectangle.Top, rectangle.Right),
+                new Point(rectangle.Bottom, rectangle.Right),
+                new Point(rectangle.Bottom, rectangle.Left),
             };
 
-            var brush = new VTBrush
+            var brush = new Brush
             {
-                Paint = new VTPaint()
+                Paint = new Paint()
             };
             brush.Paint.FillColor = color;
 
             this.DrawPolygon(list, brush);
         }
 
-        public void DrawTextOnPath(List<VTPoint> geometry, VTBrush style)
+        public void DrawTextOnPath(List<Point> geometry, Brush style)
         {
             // buggggyyyyyy
             // requires an amazing collision system to work :/
@@ -608,7 +610,7 @@ namespace VectorTileRenderer
             var right = bounds.Right + style.Paint.TextSize;
             var bottom = bounds.Bottom + style.Paint.TextSize;
 
-            var rectangle = new VTRect(left, top, right - left, bottom - top);
+            var rectangle = new Rect(left, top, right - left, bottom - top);
 
             //if (rectangle.Left <= 0 || rectangle.Right >= width || rectangle.Top <= 0 || rectangle.Bottom >= height)
             //{
@@ -638,21 +640,20 @@ namespace VectorTileRenderer
 
 
             var offset = new SKPoint((float)style.Paint.TextOffset.X, (float)style.Paint.TextOffset.Y);
-            var bytes = Encoding.UTF32.GetBytes(text);
             if (style.Paint.TextStrokeWidth != 0)
             {
                 // TODO implement this func custom way...
-                canvas.DrawTextOnPath(bytes, path, offset, GetTextStrokePaint(style));
+                canvas.DrawTextOnPath(text, path, offset, GetTextStrokePaint(style));
             }
 
-            canvas.DrawTextOnPath(bytes, path, offset, GetTextPaint(style));
+            canvas.DrawTextOnPath(text, path, offset, GetTextPaint(style));
 
 
             //canvas.DrawText(Encoding.UTF32.GetBytes(bending.ToString("F")), new SKPoint((float)left + 10, (float)top + 10), getTextStrokePaint(style));
             //canvas.DrawText(Encoding.UTF32.GetBytes(bending.ToString("F")), new SKPoint((float)left + 10, (float)top + 10), getTextPaint(style));
         }
 
-        public void DrawPoint(VTPoint geometry, VTBrush style)
+        public void DrawPoint(Point geometry, Brush style)
         {
             if (style.Paint.IconImage != null)
             {
@@ -660,16 +661,16 @@ namespace VectorTileRenderer
             }
         }
 
-        public void DrawPolygon(List<VTPoint> geometry, VTBrush style)
+        public void DrawPolygon(List<Point> geometry, Brush style)
         {
-            List<List<VTPoint>> allGeometries = null;
+            List<List<Point>> allGeometries = null;
             if (ClipOverflow)
             {
                 allGeometries = ClipPolygon(geometry);
             }
             else
             {
-                allGeometries = new List<List<VTPoint>>() { geometry };
+                allGeometries = new List<List<Point>>() { geometry };
             }
 
             if (allGeometries == null)
@@ -699,7 +700,7 @@ namespace VectorTileRenderer
 
         }
 
-        public void DrawImage(Stream imageStream, VTBrush style)
+        public void DrawImage(Stream imageStream, Brush style)
         {
             try
             {
@@ -717,7 +718,7 @@ namespace VectorTileRenderer
             }
         }
 
-        public void DrawUnknown(List<List<VTPoint>> geometry, VTBrush style)
+        public void DrawUnknown(List<List<Point>> geometry, Brush style)
         {
 
         }

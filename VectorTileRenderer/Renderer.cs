@@ -1,10 +1,12 @@
-﻿using System;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using AliFlex.VectorTileRenderer.Enums;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     public class Renderer
     {
@@ -75,6 +77,7 @@ namespace VectorTileRenderer
                       }
                       catch (Exception e)
                       {
+                          System.Diagnostics.Debug.WriteLine(e.Message);
                           return;
                       }
                   }
@@ -94,8 +97,8 @@ namespace VectorTileRenderer
 
         public async static Task<byte[]> Render(VectorStyle style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
-            Dictionary<VTSource, Stream> rasterTileCache = new Dictionary<VTSource, Stream>();
-            Dictionary<VTSource, VectorTile> vectorTileCache = new Dictionary<VTSource, VectorTile>();
+            Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
+            Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
             Dictionary<string, List<VectorTileLayer>> categorizedVectorLayers = new Dictionary<string, List<VectorTileLayer>>();
 
             double actualZoom = zoom;
@@ -113,7 +116,7 @@ namespace VectorTileRenderer
 
             canvas.StartDrawing(sizeX, sizeY);
 
-            var visualLayers = new List<VTVisualLayer>();
+            var visualLayers = new List<VisualLayer>();
 
             // TODO refactor this messy block
             foreach (var layer in style.Layers)
@@ -162,7 +165,7 @@ namespace VectorTileRenderer
                                             for (int i = 0; i < geometry.Count; i++)
                                             {
                                                 var point = geometry[i];
-                                                geometry[i] = new VTPoint(point.X / feature.Extent * sizeX, point.Y / feature.Extent * sizeY);
+                                                geometry[i] = new Point(point.X / feature.Extent * sizeX, point.Y / feature.Extent * sizeY);
                                             }
                                         }
                                     }
@@ -212,9 +215,9 @@ namespace VectorTileRenderer
                                     continue;
                                 }
 
-                                visualLayers.Add(new VTVisualLayer()
+                                visualLayers.Add(new VisualLayer()
                                 {
-                                    Type = VTVisualLayerType.Raster,
+                                    Type = VisualLayerType.Raster,
                                     RasterStream = rasterTileCache[layer.Source],
                                     Brush = brush,
                                 });
@@ -260,9 +263,9 @@ namespace VectorTileRenderer
                                         continue;
                                     }
 
-                                    visualLayers.Add(new VTVisualLayer()
+                                    visualLayers.Add(new VisualLayer()
                                     {
-                                        Type = VTVisualLayerType.Vector,
+                                        Type = VisualLayerType.Vector,
                                         VectorTileFeature = feature,
                                         Geometry = feature.Geometry,
                                         Brush = brush,
@@ -286,7 +289,7 @@ namespace VectorTileRenderer
             // defered rendering to preserve text drawing order
             foreach (var layer in visualLayers.OrderBy(item => item.Brush.ZIndex))
             {
-                if (layer.Type == VTVisualLayerType.Vector)
+                if (layer.Type == VisualLayerType.Vector)
                 {
                     var feature = layer.VectorTileFeature;
                     var geometry = layer.Geometry;
@@ -337,7 +340,7 @@ namespace VectorTileRenderer
 
                     }
                 }
-                else if (layer.Type == VTVisualLayerType.Raster)
+                else if (layer.Type == VisualLayerType.Raster)
                 {
                     canvas.DrawImage(layer.RasterStream, layer.Brush);
                     layer.RasterStream.Close();
@@ -346,7 +349,7 @@ namespace VectorTileRenderer
 
             foreach (var layer in visualLayers.OrderBy(item => item.Brush.ZIndex).Reverse())
             {
-                if (layer.Type == VTVisualLayerType.Vector)
+                if (layer.Type == VisualLayerType.Vector)
                 {
                     var feature = layer.VectorTileFeature;
                     var geometry = layer.Geometry;
@@ -385,13 +388,13 @@ namespace VectorTileRenderer
             return canvas.FinishDrawing();
         }
 
-        static List<List<VTPoint>> LocalizeGeometry(List<List<VTPoint>> coordinates, double sizeX, double sizeY, double extent)
+        static List<List<Point>> LocalizeGeometry(List<List<Point>> coordinates, double sizeX, double sizeY, double extent)
         {
             return coordinates.Select(list =>
             {
                 return list.Select(point =>
                 {
-                    VTPoint newPoint = new VTPoint(0, 0);
+                    Point newPoint = new Point(0, 0);
 
                     var x = Utils.ConvertRange(point.X, 0, extent, 0, sizeX, false);
                     var y = Utils.ConvertRange(point.Y, 0, extent, 0, sizeY, false);

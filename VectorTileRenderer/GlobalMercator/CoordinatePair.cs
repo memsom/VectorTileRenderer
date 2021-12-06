@@ -1,4 +1,4 @@
-﻿namespace VectorTileRenderer
+﻿namespace AliFlex.VectorTileRenderer.GlobalMercator
 {
     /*
         GlobalMercator.cs

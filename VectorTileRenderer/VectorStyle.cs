@@ -1,74 +1,26 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using AliFlex.VectorTileRenderer.Enums;
+using Newtonsoft.Json.Linq;
 using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
-    public enum VectorStyleKind { Basic, Bright, Dark, Light, Liberty, Custom }
-
-    public static class VectorStyleReader
-    {
-        public static string GetStyle(VectorStyleKind styleKind)
-        {
-            var name = styleKind.ToString().ToLower();
-            var assembly = Assembly.GetExecutingAssembly();
-            var nsname = assembly.GetName().Name;
-            var resourceName = $"{nsname}.Styles.{name}-style.json";
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
-            using (var reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
-        }
-
-
-
-        public static bool TryGetFont(string name, out Stream stream)
-        {
-            var result = false;
-            try
-            {
-                name = name.Replace(' ', '-'); // spaces to dashes
-                var assembly = Assembly.GetExecutingAssembly();
-                var nsname = assembly.GetName().Name;
-                var resourceName = $"{nsname}.Styles.fonts.{name}";
-                using (var tstream = assembly.GetManifestResourceStream(resourceName))
-                using (var reader = new StreamReader(tstream))
-                {
-                    stream = new MemoryStream();
-                    tstream.CopyTo(stream);
-                    stream.Seek(0, SeekOrigin.Begin); // make sure it is at stream start
-                    result = true;
-                }
-            }
-            catch (Exception)
-            {
-                stream = null;
-                result = false;
-            }
-
-            return result;
-        }
-    }
-
-
     public class VectorStyle
     {
         public readonly string Hash = "";
-        public List<VTLayer> Layers = new List<VTLayer>();
-        public Dictionary<string, VTSource> Sources = new Dictionary<string, VTSource>();
+        public List<Layer> Layers = new List<Layer>();
+        public Dictionary<string, Source> Sources = new Dictionary<string, Source>();
         public Dictionary<string, object> Metadata = new Dictionary<string, object>();
         //double screenScale = 0.2;// = 0.3;
         //double emToPx = 16;
 
-        ConcurrentDictionary<string, VTBrush[]> brushesCache = new ConcurrentDictionary<string, VTBrush[]>();
+        ConcurrentDictionary<string, Brush[]> brushesCache = new ConcurrentDictionary<string, Brush[]>();
 
         public string CustomStyle { get; set; } = default;
 
@@ -110,7 +62,7 @@ namespace VectorTileRenderer
 
             foreach (JProperty jSource in jObject.sources)
             {
-                var source = new VTSource();
+                var source = new Source();
 
                 IDictionary<string, JToken> sourceDict = jSource.Value as JObject;
 
@@ -142,7 +94,7 @@ namespace VectorTileRenderer
             int i = 0;
             foreach (var jLayer in jObject.layers)
             {
-                var layer = new VTLayer();
+                var layer = new Layer();
                 layer.Index = i;
 
                 IDictionary<string, JToken> layerDict = jLayer;
@@ -241,9 +193,9 @@ namespace VectorTileRenderer
             }
         }
 
-        public VTBrush[] GetStyleByType(string type, double zoom, double scale = 1)
+        public Brush[] GetStyleByType(string type, double zoom, double scale = 1)
         {
-            List<VTBrush> results = new List<VTBrush>();
+            List<Brush> results = new List<Brush>();
 
             int i = 0;
             foreach (var layer in Layers)
@@ -332,20 +284,20 @@ namespace VectorTileRenderer
         //    return result;
         //}
 
-        public VTBrush ParseStyle(VTLayer layer, double scale, Dictionary<string, object> attributes)
+        public Brush ParseStyle(Layer layer, double scale, Dictionary<string, object> attributes)
         {
             var paintData = layer.Paint;
             var layoutData = layer.Layout;
             var index = layer.Index;
 
-            var brush = new VTBrush
+            var brush = new Brush
             {
                 ZIndex = index,
                 Layer = layer,
                 //GlyphsDirectory = this.FontDirectory
             };
 
-            var paint = new VTPaint();
+            var paint = new Paint();
             brush.Paint = paint;
 
             if (layer.ID == "country_label")
@@ -474,15 +426,15 @@ namespace VectorTileRenderer
                     var value = (string)GetValue(layoutData["line-cap"], attributes);
                     if (value == "butt")
                     {
-                        paint.LineCap = VTPenLineCap.Flat;
+                        paint.LineCap = PenLineCap.Flat;
                     }
                     else if (value == "round")
                     {
-                        paint.LineCap = VTPenLineCap.Round;
+                        paint.LineCap = PenLineCap.Round;
                     }
                     else if (value == "square")
                     {
-                        paint.LineCap = VTPenLineCap.Square;
+                        paint.LineCap = PenLineCap.Square;
                     }
                 }
 
@@ -526,7 +478,7 @@ namespace VectorTileRenderer
                 if (layoutData.ContainsKey("text-offset"))
                 {
                     var value = (object[])GetValue(layoutData["text-offset"], attributes);
-                    paint.TextOffset = new VTPoint(Convert.ToDouble(value[0]) * scale, Convert.ToDouble(value[1]) * scale);
+                    paint.TextOffset = new Point(Convert.ToDouble(value[0]) * scale, Convert.ToDouble(value[1]) * scale);
                 }
 
                 if (layoutData.ContainsKey("text-optional"))
@@ -539,15 +491,15 @@ namespace VectorTileRenderer
                     var value = (string)GetValue(layoutData["text-transform"], attributes);
                     if (value == "none")
                     {
-                        paint.TextTransform = VTTextTransform.None;
+                        paint.TextTransform = TextTransform.None;
                     }
                     else if (value == "uppercase")
                     {
-                        paint.TextTransform = VTTextTransform.Uppercase;
+                        paint.TextTransform = TextTransform.Uppercase;
                     }
                     else if (value == "lowercase")
                     {
-                        paint.TextTransform = VTTextTransform.Lowercase;
+                        paint.TextTransform = TextTransform.Lowercase;
                     }
                 }
 
@@ -733,6 +685,7 @@ namespace VectorTileRenderer
             }
             catch (Exception e)
             {
+                System.Diagnostics.Debug.WriteLine(e.Message);
                 throw new NotImplementedException("Not implemented color format: " + colorString);
             }
             //return Colors.Violet;
@@ -745,10 +698,10 @@ namespace VectorTileRenderer
                 return SKColors.Transparent;
             }
 
-            return VTKnownColors.ParseColor(value);
+            return KnownColors.ParseColor(value);
         }
 
-        public bool ValidateLayer(VTLayer layer, double zoom, Dictionary<string, object> attributes)
+        public bool ValidateLayer(Layer layer, double zoom, Dictionary<string, object> attributes)
         {
             if (layer.MinZoom != null)
             {
@@ -778,10 +731,10 @@ namespace VectorTileRenderer
             return true;
         }
 
-        VTLayer[] FindLayers(double zoom, string layerName, Dictionary<string, object> attributes)
+        Layer[] FindLayers(double zoom, string layerName, Dictionary<string, object> attributes)
         {
             ////Console.WriteLine(layerName);
-            List<VTLayer> result = new List<VTLayer>();
+            List<Layer> result = new List<Layer>();
 
             foreach (var layer in Layers)
             {
@@ -904,8 +857,7 @@ namespace VectorTileRenderer
 
                     if (!(attributes[key] is IComparable))
                     {
-                        throw new NotImplementedException("Comparing colors probably");
-                        return false;
+                        throw new NotImplementedException("Comparing colors probably failed");
                     }
 
                     var valueA = (IComparable)attributes[key];

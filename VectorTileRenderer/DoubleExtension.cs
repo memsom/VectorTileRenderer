@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     static class DoubleExtension
     {

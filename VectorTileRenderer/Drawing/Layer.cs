@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer.Drawing
 {
-    public class VTLayer
+    public class Layer
     {
         public int Index { get; set; } = -1;
         public string ID { get; set; } = "";
         public string Type { get; set; } = "";
         public string SourceName { get; set; } = "";
-        public VTSource Source { get; set; } = null;
+        public Source Source { get; set; } = null;
         public string SourceLayer { get; set; } = "";
         public Dictionary<string, object> Paint { get; set; } = new Dictionary<string, object>();
         public Dictionary<string, object> Layout { get; set; } = new Dictionary<string, object>();

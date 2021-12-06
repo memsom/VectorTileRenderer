@@ -1,4 +1,5 @@
-﻿using Mapbox.VectorTile.Geometry;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using Mapbox.VectorTile.Geometry;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +7,7 @@ using System.IO.Compression;
 using System.Threading.Tasks;
 
 
-namespace VectorTileRenderer.Sources
+namespace AliFlex.VectorTileRenderer.Sources
 {
     public class PbfTileSource : IVectorTileSource
     {
@@ -120,18 +121,18 @@ namespace VectorTileRenderer.Sources
                         vectorFeature.GeometryType = ConvertGeometryType(feat.GeometryType);
                         vectorFeature.Attributes = feat.GetProperties();
 
-                        var vectorGeometry = new List<List<VTPoint>>();
+                        var vectorGeometry = new List<List<Point>>();
 
                         foreach (var points in feat.Geometry<int>())
                         {
-                        var vectorPoints = new List<VTPoint>();
+                        var vectorPoints = new List<Point>();
 
                             foreach (var coordinate in points)
                             {
                                 var dX = (double)coordinate.X / (double)lyr.Extent;
                                 var dY = (double)coordinate.Y / (double)lyr.Extent;
 
-                                vectorPoints.Add(new VTPoint(dX, dY));
+                                vectorPoints.Add(new Point(dX, dY));
 
                                 //var newX = Utils.ConvertRange(dX, extent.Left, extent.Right, 0, vectorFeature.Extent);
                                 //var newY = Utils.ConvertRange(dY, extent.Top, extent.Bottom, 0, vectorFeature.Extent);

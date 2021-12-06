@@ -1,16 +1,14 @@
 ﻿using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer.Drawing
 {
     // this is taken from the WPF source, and smashes some of Parses code in to it too
-    internal static class VTKnownColors
+    internal static class KnownColors
     {
-
-        static VTKnownColors()
+        static KnownColors()
         {
             var type = typeof(SKColors);
             var fia = type.GetFields()
@@ -24,7 +22,6 @@ namespace VectorTileRenderer
                 s_knownArgbColors[aRGBString] = colorValue;
             }
         }
-
 
         static internal string MatchColor(string colorString, out bool isKnownColor, out bool isNumericColor, out bool isContextColor, out bool isScRgbColor)
         {
@@ -73,14 +70,13 @@ namespace VectorTileRenderer
             return trimmedString;
         }
 
-
         internal static SKColor ParseColor(string color)
         {
             bool isPossibleKnowColor;
             bool isNumericColor;
             bool isScRgbColor;
             bool isContextColor;
-            string trimmedColor = VTKnownColors.MatchColor(color, out isPossibleKnowColor, out isNumericColor, out isContextColor, out isScRgbColor);
+            string trimmedColor = KnownColors.MatchColor(color, out isPossibleKnowColor, out isNumericColor, out isContextColor, out isScRgbColor);
 
             if ((isPossibleKnowColor == false) &&
                 (isNumericColor == false) &&
@@ -97,7 +93,7 @@ namespace VectorTileRenderer
             }
             else
             {
-                return VTKnownColors.ColorStringToKnownColor(trimmedColor);
+                return KnownColors.ColorStringToKnownColor(trimmedColor);
             }
         }
 
@@ -105,7 +101,7 @@ namespace VectorTileRenderer
         const int s_aLower = (int)'a';
         const int s_aUpper = (int)'A';
 
-        static private int ParseHexChar(char c)
+        static int ParseHexChar(char c)
         {
             int intChar = (int)c;
 
@@ -126,7 +122,7 @@ namespace VectorTileRenderer
             throw new FormatException("Bad format");
         }
 
-        static private SKColor ParseHexColor(string trimmedColor)
+        static SKColor ParseHexColor(string trimmedColor)
         {
             int a, r, g, b;
             a = 255;
@@ -579,11 +575,7 @@ namespace VectorTileRenderer
             return SKColors.Transparent;
         }
 
-#if DEBUG
-        private static int s_count = 0;
-#endif
-
         //private static Dictionary<uint, SolidColorBrush> s_solidColorBrushCache = new Dictionary<uint, SolidColorBrush>();
-        private static Dictionary<string, SKColor> s_knownArgbColors = new Dictionary<string, SKColor>();
+        static Dictionary<string, SKColor> s_knownArgbColors = new Dictionary<string, SKColor>();
     }
 }

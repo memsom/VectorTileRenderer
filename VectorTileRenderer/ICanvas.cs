@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using System.Collections.Generic;
 using System.IO;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     public interface ICanvas
     {
@@ -9,21 +10,21 @@ namespace VectorTileRenderer
 
         void StartDrawing(double sizeX, double sizeY);
 
-        void DrawBackground(VTBrush style);
+        void DrawBackground(Brush style);
 
-        void DrawLineString(List<VTPoint> geometry, VTBrush style);
+        void DrawLineString(List<Point> geometry, Brush style);
 
-        void DrawPolygon(List<VTPoint> geometry, VTBrush style);
+        void DrawPolygon(List<Point> geometry, Brush style);
 
-        void DrawPoint(VTPoint geometry, VTBrush style);
+        void DrawPoint(Point geometry, Brush style);
 
-        void DrawText(VTPoint geometry, VTBrush style);
+        void DrawText(Point geometry, Brush style);
 
-        void DrawTextOnPath(List<VTPoint> geometry, VTBrush style);
+        void DrawTextOnPath(List<Point> geometry, Brush style);
 
-        void DrawImage(Stream imageStream, VTBrush style);
+        void DrawImage(Stream imageStream, Brush style);
 
-        void DrawUnknown(List<List<VTPoint>> geometry, VTBrush style);
+        void DrawUnknown(List<List<Point>> geometry, Brush style);
 
         byte[] FinishDrawing();
     }

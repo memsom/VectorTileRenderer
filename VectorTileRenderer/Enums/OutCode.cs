@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer.Enums
 {
     [Flags]
-    public enum VTOutCode
+    public enum OutCode
     {
         Inside = 0,
         Left = 1,

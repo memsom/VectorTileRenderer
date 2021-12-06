@@ -26,6 +26,6 @@
     <ProjectReference Include="..\..\Mapbox.VectorTiles\Geometry\Mapbox.VectorTile.Geometry.csproj" />
     <ProjectReference Include="..\..\Mapbox.VectorTiles\PbfReader\Mapbox.VectorTile.PbfReader.csproj" />
     <ProjectReference Include="..\..\Mapbox.VectorTiles\VectorTileReader\Mapbox.VectorTile.VectorTileReader.csproj" />
-    <ProjectReference Include="..\..\VectorTileRenderer\VectorTileRenderer.csproj" />
+    <ProjectReference Include="..\..\VectorTileRenderer\AliFlux.VectorTileRenderer.csproj" />
   </ItemGroup>
 </Project>

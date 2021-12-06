@@ -1,11 +1,7 @@
-﻿using BruTile;
+﻿using AliFlex.VectorTileRenderer.Enums;
+using BruTile;
 using BruTile.Predefined;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VectorTileRenderer;
+
 
 namespace Mapsui.Demo.WPF
 {
