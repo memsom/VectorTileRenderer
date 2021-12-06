@@ -3,7 +3,7 @@
 namespace VectorTileRenderer
 {
     [Flags]
-    public enum OutCode
+    public enum VTOutCode
     {
         Inside = 0,
         Left = 1,

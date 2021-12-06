@@ -7,15 +7,14 @@ namespace Mapsui.Demo.WPF
     class VectorMbTilesProvider : ITileProvider
     {
 
-        Style style;
+        VectorStyle style;
         VectorTileRenderer.Sources.MbTilesSource provider;
         string cachePath;
 
-        public VectorMbTilesProvider(string path, string stylePath, string cachePath)
+        public VectorMbTilesProvider(string path, string cachePath, VectorStyleKind kind)
         {
             this.cachePath = cachePath;
-            style = new Style(stylePath);
-            style.FontDirectory = @"styles/fonts/";
+            style = new VectorStyle(kind);
 
             provider = new VectorTileRenderer.Sources.MbTilesSource(path);
             style.SetSourceProvider("openmaptiles", provider);

@@ -49,7 +49,7 @@ namespace VectorTileRenderer
 
         }
 
-        public void DrawBackground(Brush style)
+        public void DrawBackground(VTBrush style)
         {
             var color = new SKColor(style.Paint.BackgroundColor.Red, style.Paint.BackgroundColor.Green, style.Paint.BackgroundColor.Blue, style.Paint.BackgroundColor.Alpha);
             canvas.Clear(color);
@@ -168,7 +168,7 @@ namespace VectorTileRenderer
             return path;
         }
 
-        public void DrawLineString(List<VTPoint> geometry, Brush style)
+        public void DrawLineString(List<VTPoint> geometry, VTBrush style)
         {
             if (ClipOverflow)
             {
@@ -225,7 +225,7 @@ namespace VectorTileRenderer
             return SKTextAlign.Center;
         }
 
-        SKPaint GetTextStrokePaint(Brush style)
+        SKPaint GetTextStrokePaint(VTBrush style)
         {
             var color = style.Paint.TextStrokeColor;
 
@@ -244,7 +244,7 @@ namespace VectorTileRenderer
             return paint;
         }
 
-        SKPaint GetTextPaint(Brush style)
+        SKPaint GetTextPaint(VTBrush style)
         {
             var color = style.Paint.TextColor;
             var paint = new SKPaint()
@@ -261,7 +261,7 @@ namespace VectorTileRenderer
             return paint;
         }
 
-        string TransformText(string text, Brush style)
+        string TransformText(string text, VTBrush style)
         {
             if (text.Length == 0)
             {
@@ -284,7 +284,7 @@ namespace VectorTileRenderer
             //return Encoding.UTF32.GetBytes(newText);
         }
 
-        string BreakText(string input, SKPaint paint, Brush style)
+        string BreakText(string input, SKPaint paint, VTBrush style)
         {
             var restOfText = input;
             var brokenText = string.Empty;
@@ -328,7 +328,7 @@ namespace VectorTileRenderer
             return false;
         }
 
-        SKTypeface GetFont(string[] familyNames, Brush style)
+        SKTypeface GetFont(string[] familyNames, VTBrush style)
         {
             lock (fontLock)
             {
@@ -339,24 +339,29 @@ namespace VectorTileRenderer
                         return fontPairs[name];
                     }
 
-                    if (style.GlyphsDirectory != null)
+                    if (VectorStyleReader.TryGetFont(name + ".ttf", out var stream))
                     {
                         // check file system for ttf
-                        var newType = SKTypeface.FromFile(System.IO.Path.Combine(style.GlyphsDirectory, name + ".ttf"));
-                        if (newType != null)
-                        {
-                            fontPairs[name] = newType;
-                            return newType;
-                        }
-
-                        // check file system for otf
-                        newType = SKTypeface.FromFile(System.IO.Path.Combine(style.GlyphsDirectory, name + ".otf"));
+                        var newType = SKTypeface.FromStream(stream);
                         if (newType != null)
                         {
                             fontPairs[name] = newType;
                             return newType;
                         }
                     }
+
+                    // check file system for otf
+
+                    if (VectorStyleReader.TryGetFont(name + ".otf", out stream))
+                    {
+                        var newType = SKTypeface.FromStream(stream);
+                        if (newType != null)
+                        {
+                            fontPairs[name] = newType;
+                            return newType;
+                        }
+                    }
+                    //}
 
                     var typeface = SKTypeface.FromFamilyName(name);
                     if (typeface.FamilyName == name)
@@ -388,7 +393,7 @@ namespace VectorTileRenderer
             return typeface;
         }
 
-        void QualifyTypeface(Brush style, SKPaint paint)
+        void QualifyTypeface(VTBrush style, SKPaint paint)
         {
             var glyphs = new ushort[paint.Typeface.CountGlyphs(style.Text)];
             if (glyphs.Length < style.Text.Length)
@@ -417,7 +422,7 @@ namespace VectorTileRenderer
 
         }
 
-        public void DrawText(VTPoint geometry, Brush style)
+        public void DrawText(VTPoint geometry, VTBrush style)
         {
             if (style.Paint.TextOptional)
             {
@@ -561,16 +566,16 @@ namespace VectorTileRenderer
                 new VTPoint(rectangle.Bottom, rectangle.Left),
             };
 
-            var brush = new Brush
+            var brush = new VTBrush
             {
-                Paint = new Paint()
+                Paint = new VTPaint()
             };
             brush.Paint.FillColor = color;
 
             this.DrawPolygon(list, brush);
         }
 
-        public void DrawTextOnPath(List<VTPoint> geometry, Brush style)
+        public void DrawTextOnPath(List<VTPoint> geometry, VTBrush style)
         {
             // buggggyyyyyy
             // requires an amazing collision system to work :/
@@ -649,7 +654,7 @@ namespace VectorTileRenderer
             //canvas.DrawText(Encoding.UTF32.GetBytes(bending.ToString("F")), new SKPoint((float)left + 10, (float)top + 10), getTextPaint(style));
         }
 
-        public void DrawPoint(VTPoint geometry, Brush style)
+        public void DrawPoint(VTPoint geometry, VTBrush style)
         {
             if (style.Paint.IconImage != null)
             {
@@ -657,7 +662,7 @@ namespace VectorTileRenderer
             }
         }
 
-        public void DrawPolygon(List<VTPoint> geometry, Brush style)
+        public void DrawPolygon(List<VTPoint> geometry, VTBrush style)
         {
             List<List<VTPoint>> allGeometries = null;
             if (ClipOverflow)
@@ -696,7 +701,7 @@ namespace VectorTileRenderer
 
         }
 
-        public void DrawImage(Stream imageStream, Brush style)
+        public void DrawImage(Stream imageStream, VTBrush style)
         {
             try
             {
@@ -714,7 +719,7 @@ namespace VectorTileRenderer
             }
         }
 
-        public void DrawUnknown(List<List<VTPoint>> geometry, Brush style)
+        public void DrawUnknown(List<List<VTPoint>> geometry, VTBrush style)
         {
 
         }

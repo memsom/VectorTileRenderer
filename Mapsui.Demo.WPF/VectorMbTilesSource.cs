@@ -11,16 +11,16 @@ namespace Mapsui.Demo.WPF
 {
     class VectorMbTilesSource : BruTile.ITileSource
     {
-        VectorMbTilesProvider provider;
+        readonly VectorMbTilesProvider provider;
 
         public ITileSchema Schema { get; }
         public string Name { get; } = "VectorMbTileSource";
         public Attribution Attribution { get; } = new Attribution();
 
-        public VectorMbTilesSource(string path, string stylePath, string cachePath)
+        public VectorMbTilesSource(string path, string cachePath, VectorStyleKind style = VectorStyleKind.Basic)
         {
             Schema = GetTileSchema();
-            provider = new VectorMbTilesProvider(path, stylePath, cachePath);
+            provider = new VectorMbTilesProvider(path, cachePath, style);
         }
 
         public static ITileSchema GetTileSchema()

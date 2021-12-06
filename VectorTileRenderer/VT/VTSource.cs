@@ -1,6 +1,6 @@
 ﻿namespace VectorTileRenderer
 {
-    public class Source
+    public class VTSource
     {
         public string URL { get; set; } = "";
         public string Type { get; set; } = "";

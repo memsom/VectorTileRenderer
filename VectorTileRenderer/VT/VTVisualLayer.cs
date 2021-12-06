@@ -3,9 +3,9 @@ using System.IO;
 
 namespace VectorTileRenderer
 {
-    public class VisualLayer
+    public class VTVisualLayer
     {
-        public VisualLayerType Type { get; set; }
+        public VTVisualLayerType Type { get; set; }
 
         public Stream RasterStream { get; set; } = null;
 
@@ -13,7 +13,7 @@ namespace VectorTileRenderer
 
         public List<List<VTPoint>> Geometry { get; set; } = null;
 
-        public Brush Brush { get; set; } = null;
+        public VTBrush Brush { get; set; } = null;
     }
 }
 

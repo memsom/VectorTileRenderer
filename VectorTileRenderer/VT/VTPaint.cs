@@ -2,7 +2,7 @@
 
 namespace VectorTileRenderer
 {
-    public class Paint
+    public class VTPaint
     {
         public SKColor BackgroundColor { get; set; }
         public string BackgroundPattern { get; set; }

@@ -1,7 +1,10 @@
 ﻿using Mapsui.Layers;
 using Mapsui.Projection;
+using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using VectorTileRenderer;
 
 namespace Mapsui.Demo.WPF
 {
@@ -13,7 +16,12 @@ namespace Mapsui.Demo.WPF
         public MainWindow()
         {
             InitializeComponent();
-            
+
+            var items = Enum.GetValues(typeof(VectorStyleKind)).Cast<VectorStyleKind>();
+
+            styleBox.ItemsSource = items;
+            styleBox.SelectedIndex = 0;
+
             var point = new Point(8.542693, 47.368659);
             var sphericalPoint = SphericalMercator.FromLonLat(point.X, point.Y);
 
@@ -23,10 +31,11 @@ namespace Mapsui.Demo.WPF
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var styleName = (styleBox.SelectedItem as ComboBoxItem).Tag as string;
+            var styleName = (VectorStyleKind)styleBox.SelectedItem;
             var mainDir = "../../../";
 
-            var source = new VectorMbTilesSource(mainDir + @"tiles/zurich.mbtiles", mainDir + @"styles/" + styleName + "-style.json", mainDir + @"tile-cache/");
+
+            var source = new VectorMbTilesSource(mainDir + @"tiles/zurich.mbtiles", mainDir + @"tile-cache/", styleName);
             MyMapControl.Map.Layers.Clear();
             MyMapControl.Map.Layers.Add(new TileLayer(source));
             MyMapControl.Refresh();

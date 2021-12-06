@@ -4,27 +4,77 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace VectorTileRenderer
 {
-    public class Style
+    public enum VectorStyleKind { Basic, Bright, Dark, Light, Liberty }
+
+    public static class VectorStyleReader
+    {
+        public static string GetStyle(VectorStyleKind styleKind)
+        {
+            var name = styleKind.ToString().ToLower();
+            var assembly = Assembly.GetExecutingAssembly();
+            var nsname = assembly.GetName().Name;
+            var resourceName = $"{nsname}.Styles.{name}-style.json";
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+
+
+        public static bool TryGetFont(string name, out Stream stream)
+        {
+            var result = false;
+            try
+            {
+                name = name.Replace(' ', '-'); // spaces to dashes
+                var assembly = Assembly.GetExecutingAssembly();
+                var nsname = assembly.GetName().Name;
+                var resourceName = $"{nsname}.Styles.fonts.{name}";
+                using (var tstream = assembly.GetManifestResourceStream(resourceName))
+                using (var reader = new StreamReader(tstream))
+                {
+                    stream = new MemoryStream();
+                    tstream.CopyTo(stream);
+                    stream.Seek(0, SeekOrigin.Begin); // make sure it is at stream start
+                    result = true;
+                }
+            }
+            catch (Exception)
+            {
+                stream = null;
+                result = false;
+            }
+
+            return result;
+        }
+    }
+
+
+    public class VectorStyle
     {
         public readonly string Hash = "";
-        public List<Layer> Layers = new List<Layer>();
-        public Dictionary<string, Source> Sources = new Dictionary<string, Source>();
+        public List<VTLayer> Layers = new List<VTLayer>();
+        public Dictionary<string, VTSource> Sources = new Dictionary<string, VTSource>();
         public Dictionary<string, object> Metadata = new Dictionary<string, object>();
         //double screenScale = 0.2;// = 0.3;
         //double emToPx = 16;
 
-        ConcurrentDictionary<string, Brush[]> brushesCache = new ConcurrentDictionary<string, Brush[]>();
+        ConcurrentDictionary<string, VTBrush[]> brushesCache = new ConcurrentDictionary<string, VTBrush[]>();
 
-        public string FontDirectory { get; set; } = null;
+        //public string FontDirectory { get; set; } = @"fonts/";
 
-        public Style(string path, double scale = 1)
+        public VectorStyle(VectorStyleKind style, double scale = 1)
         {
-            var json = System.IO.File.ReadAllText(path);
+            var json = VectorStyleReader.GetStyle(style); //System.IO.File.ReadAllText(path);
             dynamic jObject = JObject.Parse(json);
 
             if (jObject["metadata"] != null)
@@ -36,7 +86,7 @@ namespace VectorTileRenderer
 
             foreach (JProperty jSource in jObject.sources)
             {
-                var source = new Source();
+                var source = new VTSource();
 
                 IDictionary<string, JToken> sourceDict = jSource.Value as JObject;
 
@@ -68,7 +118,7 @@ namespace VectorTileRenderer
             int i = 0;
             foreach (var jLayer in jObject.layers)
             {
-                var layer = new Layer();
+                var layer = new VTLayer();
                 layer.Index = i;
 
                 IDictionary<string, JToken> layerDict = jLayer;
@@ -167,9 +217,9 @@ namespace VectorTileRenderer
             }
         }
 
-        public Brush[] GetStyleByType(string type, double zoom, double scale = 1)
+        public VTBrush[] GetStyleByType(string type, double zoom, double scale = 1)
         {
-            List<Brush> results = new List<Brush>();
+            List<VTBrush> results = new List<VTBrush>();
 
             int i = 0;
             foreach (var layer in Layers)
@@ -258,20 +308,20 @@ namespace VectorTileRenderer
         //    return result;
         //}
 
-        public Brush ParseStyle(Layer layer, double scale, Dictionary<string, object> attributes)
+        public VTBrush ParseStyle(VTLayer layer, double scale, Dictionary<string, object> attributes)
         {
             var paintData = layer.Paint;
             var layoutData = layer.Layout;
             var index = layer.Index;
 
-            var brush = new Brush
+            var brush = new VTBrush
             {
                 ZIndex = index,
                 Layer = layer,
-                GlyphsDirectory = this.FontDirectory
+                //GlyphsDirectory = this.FontDirectory
             };
 
-            var paint = new Paint();
+            var paint = new VTPaint();
             brush.Paint = paint;
 
             if (layer.ID == "country_label")
@@ -611,7 +661,7 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("hsl("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                
+
                 double h = double.Parse(segments[1], culture);
                 double s = double.Parse(segments[2], culture);
                 double l = double.Parse(segments[3], culture);
@@ -622,7 +672,7 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("hsla("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                
+
                 double h = double.Parse(segments[1], culture);
                 double s = double.Parse(segments[2], culture);
                 double l = double.Parse(segments[3], culture);
@@ -634,7 +684,7 @@ namespace VectorTileRenderer
             if (colorString.StartsWith("rgba("))
             {
                 var segments = colorString.Replace('%', '\0').Split(',', '(', ')');
-                
+
                 double r = double.Parse(segments[1], culture);
                 double g = double.Parse(segments[2], culture);
                 double b = double.Parse(segments[3], culture);
@@ -674,7 +724,7 @@ namespace VectorTileRenderer
             return VTKnownColors.ParseColor(value);
         }
 
-        public bool ValidateLayer(Layer layer, double zoom, Dictionary<string, object> attributes)
+        public bool ValidateLayer(VTLayer layer, double zoom, Dictionary<string, object> attributes)
         {
             if (layer.MinZoom != null)
             {
@@ -704,10 +754,10 @@ namespace VectorTileRenderer
             return true;
         }
 
-        Layer[] FindLayers(double zoom, string layerName, Dictionary<string, object> attributes)
+        VTLayer[] FindLayers(double zoom, string layerName, Dictionary<string, object> attributes)
         {
             ////Console.WriteLine(layerName);
-            List<Layer> result = new List<Layer>();
+            List<VTLayer> result = new List<VTLayer>();
 
             foreach (var layer in Layers)
             {

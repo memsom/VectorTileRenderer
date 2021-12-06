@@ -11,7 +11,7 @@ namespace VectorTileRenderer
         // TODO make it instance based... maybe
         static object cacheLock = new object();
 
-        public async static Task<byte[]> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
+        public async static Task<byte[]> RenderCached(string cachePath, VectorStyle style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
             string layerString = whiteListLayers == null ? "" : string.Join(",-", whiteListLayers.ToArray());
 
@@ -92,10 +92,10 @@ namespace VectorTileRenderer
             return File.ReadAllBytes(path);
         }
 
-        public async static Task<byte[]> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
+        public async static Task<byte[]> Render(VectorStyle style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
-            Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
-            Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
+            Dictionary<VTSource, Stream> rasterTileCache = new Dictionary<VTSource, Stream>();
+            Dictionary<VTSource, VectorTile> vectorTileCache = new Dictionary<VTSource, VectorTile>();
             Dictionary<string, List<VectorTileLayer>> categorizedVectorLayers = new Dictionary<string, List<VectorTileLayer>>();
 
             double actualZoom = zoom;
@@ -113,7 +113,7 @@ namespace VectorTileRenderer
 
             canvas.StartDrawing(sizeX, sizeY);
 
-            var visualLayers = new List<VisualLayer>();
+            var visualLayers = new List<VTVisualLayer>();
 
             // TODO refactor this messy block
             foreach (var layer in style.Layers)
@@ -212,9 +212,9 @@ namespace VectorTileRenderer
                                     continue;
                                 }
 
-                                visualLayers.Add(new VisualLayer()
+                                visualLayers.Add(new VTVisualLayer()
                                 {
-                                    Type = VisualLayerType.Raster,
+                                    Type = VTVisualLayerType.Raster,
                                     RasterStream = rasterTileCache[layer.Source],
                                     Brush = brush,
                                 });
@@ -260,9 +260,9 @@ namespace VectorTileRenderer
                                         continue;
                                     }
 
-                                    visualLayers.Add(new VisualLayer()
+                                    visualLayers.Add(new VTVisualLayer()
                                     {
-                                        Type = VisualLayerType.Vector,
+                                        Type = VTVisualLayerType.Vector,
                                         VectorTileFeature = feature,
                                         Geometry = feature.Geometry,
                                         Brush = brush,
@@ -286,7 +286,7 @@ namespace VectorTileRenderer
             // defered rendering to preserve text drawing order
             foreach (var layer in visualLayers.OrderBy(item => item.Brush.ZIndex))
             {
-                if (layer.Type == VisualLayerType.Vector)
+                if (layer.Type == VTVisualLayerType.Vector)
                 {
                     var feature = layer.VectorTileFeature;
                     var geometry = layer.Geometry;
@@ -337,7 +337,7 @@ namespace VectorTileRenderer
 
                     }
                 }
-                else if (layer.Type == VisualLayerType.Raster)
+                else if (layer.Type == VTVisualLayerType.Raster)
                 {
                     canvas.DrawImage(layer.RasterStream, layer.Brush);
                     layer.RasterStream.Close();
@@ -346,7 +346,7 @@ namespace VectorTileRenderer
 
             foreach (var layer in visualLayers.OrderBy(item => item.Brush.ZIndex).Reverse())
             {
-                if (layer.Type == VisualLayerType.Vector)
+                if (layer.Type == VTVisualLayerType.Vector)
                 {
                     var feature = layer.VectorTileFeature;
                     var geometry = layer.Geometry;

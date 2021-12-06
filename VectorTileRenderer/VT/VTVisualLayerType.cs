@@ -1,6 +1,6 @@
 ﻿namespace VectorTileRenderer
 {
-    public enum VisualLayerType
+    public enum VTVisualLayerType
     {
         Vector,
         Raster,

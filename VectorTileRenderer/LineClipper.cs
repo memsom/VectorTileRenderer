@@ -6,21 +6,21 @@ namespace VectorTileRenderer
 {
     static class LineClipper
     {
-        static OutCode ComputeOutCode(double x, double y, VTRect r)
+        static VTOutCode ComputeOutCode(double x, double y, VTRect r)
         {
-            var code = OutCode.Inside;
+            var code = VTOutCode.Inside;
 
-            if (x < r.Left) code |= OutCode.Left;
-            if (x > r.Right) code |= OutCode.Right;
-            if (y < r.Top) code |= OutCode.Top;
-            if (y > r.Bottom) code |= OutCode.Bottom;
+            if (x < r.Left) code |= VTOutCode.Left;
+            if (x > r.Right) code |= VTOutCode.Right;
+            if (y < r.Top) code |= VTOutCode.Top;
+            if (y > r.Bottom) code |= VTOutCode.Bottom;
 
             return code;
         }
 
-        static OutCode ComputeOutCode(VTPoint p, VTRect r) { return ComputeOutCode(p.X, p.Y, r); }
+        static VTOutCode ComputeOutCode(VTPoint p, VTRect r) { return ComputeOutCode(p.X, p.Y, r); }
 
-        static VTPoint CalculateIntersection(VTRect r, VTPoint p1, VTPoint p2, OutCode clipTo)
+        static VTPoint CalculateIntersection(VTRect r, VTPoint p1, VTPoint p2, VTOutCode clipTo)
         {
             var dx = (p2.X - p1.X);
             var dy = (p2.Y - p1.Y);
@@ -28,28 +28,28 @@ namespace VectorTileRenderer
             var slopeY = dx / dy; // slope to use for possibly-vertical lines
             var slopeX = dy / dx; // slope to use for possibly-horizontal lines
 
-            if (clipTo.HasFlag(OutCode.Top))
+            if (clipTo.HasFlag(VTOutCode.Top))
             {
                 return new VTPoint(
                     p1.X + slopeY * (r.Top - p1.Y),
                     r.Top
                     );
             }
-            if (clipTo.HasFlag(OutCode.Bottom))
+            if (clipTo.HasFlag(VTOutCode.Bottom))
             {
                 return new VTPoint(
                     p1.X + slopeY * (r.Bottom - p1.Y),
                     r.Bottom
                     );
             }
-            if (clipTo.HasFlag(OutCode.Right))
+            if (clipTo.HasFlag(VTOutCode.Right))
             {
                 return new VTPoint(
                     r.Right,
                     p1.Y + slopeX * (r.Right - p1.X)
                     );
             }
-            if (clipTo.HasFlag(OutCode.Left))
+            if (clipTo.HasFlag(VTOutCode.Left))
             {
                 return new VTPoint(
                     r.Left,
@@ -70,7 +70,7 @@ namespace VectorTileRenderer
             { // should only iterate twice, at most
               // Case 1:
               // both endpoints are within the clipping region
-                if ((outCodeP1 | outCodeP2) == OutCode.Inside)
+                if ((outCodeP1 | outCodeP2) == VTOutCode.Inside)
                 {
                     accept = true;
                     break;
@@ -87,7 +87,7 @@ namespace VectorTileRenderer
                 // The endpoints are in different regions, and the segment is partially within the clipping rectangle
 
                 // Select one of the endpoints outside the clipping rectangle
-                var outCode = outCodeP1 != OutCode.Inside ? outCodeP1 : outCodeP2;
+                var outCode = outCodeP1 != VTOutCode.Inside ? outCodeP1 : outCodeP2;
 
                 // calculate the intersection of the line with the clipping rectangle
                 var p = CalculateIntersection(r, p1, p2, outCode);

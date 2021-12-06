@@ -2,13 +2,13 @@
 
 namespace VectorTileRenderer
 {
-    public class Layer
+    public class VTLayer
     {
         public int Index { get; set; } = -1;
         public string ID { get; set; } = "";
         public string Type { get; set; } = "";
         public string SourceName { get; set; } = "";
-        public Source Source { get; set; } = null;
+        public VTSource Source { get; set; } = null;
         public string SourceLayer { get; set; } = "";
         public Dictionary<string, object> Paint { get; set; } = new Dictionary<string, object>();
         public Dictionary<string, object> Layout { get; set; } = new Dictionary<string, object>();
