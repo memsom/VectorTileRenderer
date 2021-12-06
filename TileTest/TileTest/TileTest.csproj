@@ -22,10 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Mapbox.VectorTiles\ExtensionMethods\ExtensionMethods.csproj" />
-    <ProjectReference Include="..\..\Mapbox.VectorTiles\Geometry\Geometry.csproj" />
-    <ProjectReference Include="..\..\Mapbox.VectorTiles\PbfReader\PbfReader.csproj" />
-    <ProjectReference Include="..\..\Mapbox.VectorTiles\VectorTileReader\VectorTileReader.csproj" />
+    <ProjectReference Include="..\..\Mapbox.VectorTiles\ExtensionMethods\Mapbox.VectorTile.ExtensionMethods.csproj" />
+    <ProjectReference Include="..\..\Mapbox.VectorTiles\Geometry\Mapbox.VectorTile.Geometry.csproj" />
+    <ProjectReference Include="..\..\Mapbox.VectorTiles\PbfReader\Mapbox.VectorTile.PbfReader.csproj" />
+    <ProjectReference Include="..\..\Mapbox.VectorTiles\VectorTileReader\Mapbox.VectorTile.VectorTileReader.csproj" />
     <ProjectReference Include="..\..\VectorTileRenderer\VectorTileRenderer.csproj" />
   </ItemGroup>
 </Project>

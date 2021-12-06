@@ -11,14 +11,16 @@ namespace Mapsui.Demo.WPF
         VectorTileRenderer.Sources.MbTilesSource provider;
         string cachePath;
 
-        public VectorMbTilesProvider(string path, string cachePath, VectorStyleKind kind)
+        public VectorMbTilesProvider(string path, string cachePath, VectorStyleKind kind, string customStyle = default)
         {
             this.cachePath = cachePath;
-            style = new VectorStyle(kind);
+            style = new VectorStyle(kind)
+            {
+                CustomStyle = customStyle
+            };
 
             provider = new VectorTileRenderer.Sources.MbTilesSource(path);
             style.SetSourceProvider("openmaptiles", provider);
-
         }
         
         public byte[] GetTile(TileInfo tileInfo)

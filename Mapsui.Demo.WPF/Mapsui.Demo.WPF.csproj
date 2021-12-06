@@ -18,7 +18,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -207,7 +207,7 @@
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>    
+    </PropertyGroup>
     <Error Condition="!Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets'))" />
     <Error Condition="!Exists('..\packages\SkiaSharp.2.80.3\build\net462\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SkiaSharp.2.80.3\build\net462\SkiaSharp.targets'))" />
     <Error Condition="!Exists('..\packages\HarfBuzzSharp.2.6.1.7\build\net462\HarfBuzzSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\HarfBuzzSharp.2.6.1.7\build\net462\HarfBuzzSharp.targets'))" />
@@ -219,7 +219,7 @@
   <PropertyGroup>
     <PostBuildEvent>rem xcopy "$(SolutionDir)VectorTileRenderer\bin\Debug\netstandard2.0\x64\SQLite.Interop.dll"  "$(TargetDir)" /y
 del /F /S /Q $(SolutionDir)tile-cache\*.*</PostBuildEvent>
-  </PropertyGroup>  
+  </PropertyGroup>
   <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />
   <Import Project="..\packages\SkiaSharp.2.80.3\build\net462\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.2.80.3\build\net462\SkiaSharp.targets')" />
   <Import Project="..\packages\HarfBuzzSharp.2.6.1.7\build\net462\HarfBuzzSharp.targets" Condition="Exists('..\packages\HarfBuzzSharp.2.6.1.7\build\net462\HarfBuzzSharp.targets')" />

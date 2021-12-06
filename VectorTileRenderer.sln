@@ -11,13 +11,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mapsui.Demo.WPF", "Mapsui.D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MappBox", "MappBox", "{8BBC3602-3CB3-437E-9C40-A286EC1C586C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Geometry", "Mapbox.VectorTiles\Geometry\Geometry.csproj", "{DFDE44D6-DE64-4214-922F-F4A925C144E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mapbox.VectorTile.Geometry", "Mapbox.VectorTiles\Geometry\Mapbox.VectorTile.Geometry.csproj", "{DFDE44D6-DE64-4214-922F-F4A925C144E1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PbfReader", "Mapbox.VectorTiles\PbfReader\PbfReader.csproj", "{AC24FC79-0AFA-4F4F-B109-42D538560C5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mapbox.VectorTile.PbfReader", "Mapbox.VectorTiles\PbfReader\Mapbox.VectorTile.PbfReader.csproj", "{AC24FC79-0AFA-4F4F-B109-42D538560C5E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VectorTileReader", "Mapbox.VectorTiles\VectorTileReader\VectorTileReader.csproj", "{363E9255-D740-4443-BED1-1AA1950EFCF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mapbox.VectorTile.VectorTileReader", "Mapbox.VectorTiles\VectorTileReader\Mapbox.VectorTile.VectorTileReader.csproj", "{363E9255-D740-4443-BED1-1AA1950EFCF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionMethods", "Mapbox.VectorTiles\ExtensionMethods\ExtensionMethods.csproj", "{F65D30F5-2FEB-45AA-B30E-2AC529107834}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mapbox.VectorTile.ExtensionMethods", "Mapbox.VectorTiles\ExtensionMethods\Mapbox.VectorTile.ExtensionMethods.csproj", "{F65D30F5-2FEB-45AA-B30E-2AC529107834}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileTest.Android", "TileTest\TileTest.Android\TileTest.Android.csproj", "{8FE45F5E-11D3-4DEC-9ECD-5143BCD556EF}"
 EndProject

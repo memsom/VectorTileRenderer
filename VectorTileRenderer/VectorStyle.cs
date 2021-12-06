@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 
 namespace VectorTileRenderer
 {
-    public enum VectorStyleKind { Basic, Bright, Dark, Light, Liberty }
+    public enum VectorStyleKind { Basic, Bright, Dark, Light, Liberty, Custom }
 
     public static class VectorStyleReader
     {
@@ -70,11 +70,35 @@ namespace VectorTileRenderer
 
         ConcurrentDictionary<string, VTBrush[]> brushesCache = new ConcurrentDictionary<string, VTBrush[]>();
 
-        //public string FontDirectory { get; set; } = @"fonts/";
+        public string CustomStyle { get; set; } = default;
 
         public VectorStyle(VectorStyleKind style, double scale = 1)
         {
-            var json = VectorStyleReader.GetStyle(style); //System.IO.File.ReadAllText(path);
+            var json = string.Empty;
+
+            if(style == VectorStyleKind.Custom)
+            {
+                if (!string.IsNullOrWhiteSpace(CustomStyle))
+                {
+                    json = CustomStyle;
+                }
+                else
+                {
+#if DEBUG
+                    json = VectorStyleReader.GetStyle(VectorStyleKind.Basic); // fallback use who know what will happen...
+                    System.Diagnostics.Debug.WriteLine("The custom style was not set, so we have fallen back to Basic.");
+#else
+                    throw new Exception("FATAL ERROR: Style could not be loaded!");
+#endif
+                }
+            }
+            else
+            {
+                json = VectorStyleReader.GetStyle(style); 
+            }
+
+
+            // TODO - this should all be simplified to a generic template.
             dynamic jObject = JObject.Parse(json);
 
             if (jObject["metadata"] != null)

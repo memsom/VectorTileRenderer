@@ -1,19 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Configurations>Debug;Release;Debug-uid-hack;DebugUI;NativeDebug</Configurations>
+		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 	<PropertyGroup>
-		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-		<AppDesignerFolder>Properties</AppDesignerFolder>
-		<RootNamespace>VectorTileReader</RootNamespace>
-		<AssemblyName>Mapbox.VectorTile.VectorTileReader</AssemblyName>
+		<RootNamespace>Mapbox.VectorTile.ExtensionMethods</RootNamespace>
+		<AssemblyName>Mapbox.VectorTile.ExtensionMethods</AssemblyName>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
 		<DebugSymbols>true</DebugSymbols>
-		<OutputPath>..\..\bin\</OutputPath>
+		<OutputPath>bin\Debug\</OutputPath>
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 		<DebugType>full</DebugType>
 		<PlatformTarget>AnyCPU</PlatformTarget>
@@ -22,7 +18,7 @@
 		<Prefer32Bit>false</Prefer32Bit>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-		<OutputPath>..\..\bin\</OutputPath>
+		<OutputPath>bin\Release\</OutputPath>
 		<DefineConstants>TRACE</DefineConstants>
 		<Optimize>true</Optimize>
 		<DebugType>pdbonly</DebugType>
@@ -32,7 +28,8 @@
 		<Prefer32Bit>false</Prefer32Bit>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Geometry\Geometry.csproj" />
-	  <ProjectReference Include="..\PbfReader\PbfReader.csproj" />
+	  <ProjectReference Include="..\Geometry\Mapbox.VectorTile.Geometry.csproj" />
+	  <ProjectReference Include="..\PbfReader\Mapbox.VectorTile.PbfReader.csproj" />
+	  <ProjectReference Include="..\VectorTileReader\Mapbox.VectorTile.VectorTileReader.csproj" />
 	</ItemGroup>
 </Project>
