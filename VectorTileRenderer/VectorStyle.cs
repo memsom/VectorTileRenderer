@@ -51,16 +51,19 @@ namespace AliFlex.VectorTileRenderer
 
 
             // TODO - this should all be simplified to a generic template.
-            dynamic jObject = JObject.Parse(json);
+            dynamic jObject2 = JObject.Parse(json);
+            var jObject = JObject.Parse(json);
 
             if (jObject["metadata"] != null)
             {
-                Metadata = jObject.metadata.ToObject<Dictionary<string, object>>();
+                Metadata = jObject["metadata"].ToObject<Dictionary<string, object>>();
             }
 
             List<string> fontNames = new List<string>();
 
-            foreach (JProperty jSource in jObject.sources)
+
+            var sources = jObject["sources"];
+            foreach (JProperty jSource in sources)
             {
                 var source = new Source();
 
@@ -91,11 +94,14 @@ namespace AliFlex.VectorTileRenderer
                 Sources[jSource.Name] = source;
             }
 
+            var layers = jObject["layers"];
             int i = 0;
-            foreach (var jLayer in jObject.layers)
+            foreach (JObject jLayer in layers)
             {
-                var layer = new Layer();
-                layer.Index = i;
+                var layer = new Layer
+                {
+                    Index = i
+                };
 
                 IDictionary<string, JToken> layerDict = jLayer;
 

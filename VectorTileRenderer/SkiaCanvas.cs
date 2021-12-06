@@ -341,20 +341,10 @@ namespace AliFlex.VectorTileRenderer
                         return fontPairs[name];
                     }
 
-                    if (VectorStyleReader.TryGetFont(name + ".ttf", out var stream))
-                    {
-                        // check file system for ttf
-                        var newType = SKTypeface.FromStream(stream);
-                        if (newType != null)
-                        {
-                            fontPairs[name] = newType;
-                            return newType;
-                        }
-                    }
 
-                    // check file system for otf
+                    // check file system for embedded fonts
 
-                    if (VectorStyleReader.TryGetFont(name + ".otf", out stream))
+                    if (VectorStyleReader.TryGetFont(name, out var stream))
                     {
                         var newType = SKTypeface.FromStream(stream);
                         if (newType != null)
