@@ -76,6 +76,7 @@
 	  <None Remove="Styles\hybrid-style.json" />
 	  <None Remove="Styles\liberty-style.json" />
 	  <None Remove="Styles\light-style.json" />
+	  <None Remove="Styles\positron-style.json" />
 	  <None Remove="Styles\runner-style.json" />
 	  <None Remove="Styles\streets-style.json" />
 	  <None Remove="Styles\toner-style.json" />
@@ -152,6 +153,7 @@
 	  <EmbeddedResource Include="Styles\hybrid-style.json" />
 	  <EmbeddedResource Include="Styles\liberty-style.json" />
 	  <EmbeddedResource Include="Styles\light-style.json" />
+	  <EmbeddedResource Include="Styles\positron-style.json" />
 	  <EmbeddedResource Include="Styles\runner-style.json" />
 	  <EmbeddedResource Include="Styles\streets-style.json" />
 	  <EmbeddedResource Include="Styles\toner-style.json" />
