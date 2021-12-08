@@ -11,11 +11,15 @@ namespace Mapsui.Demo.WPF
 
         VectorStyle style;
         MbTilesSource provider;
-        string cachePath;
+        IVectorCache cache;
 
         public VectorMbTilesProvider(string path, string cachePath, VectorStyleKind kind, string customStyle = default)
         {
-            this.cachePath = cachePath;
+            cache = new SimpleVectorCache(cachePath)
+            {
+                MaxFiles = 50,
+            };
+
             style = new VectorStyle(kind)
             {
                 CustomStyle = customStyle
@@ -33,7 +37,7 @@ namespace Mapsui.Demo.WPF
 
             try
             {
-                return Renderer.RenderCached(cachePath, style, canvas, (int)tileInfo.Index.Col, (int)tileInfo.Index.Row, Convert.ToInt32(tileInfo.Index.Level), 256, 256, 1).Result;
+                return Renderer.RenderCached(cache, style, canvas, (int)tileInfo.Index.Col, (int)tileInfo.Index.Row, Convert.ToInt32(tileInfo.Index.Level), 256, 256, 1).Result;
             }
             catch
             {

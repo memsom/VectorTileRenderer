@@ -13,7 +13,7 @@ namespace AliFlex.VectorTileRenderer
         // TODO make it instance based... maybe
         static object cacheLock = new object();
 
-        public async static Task<byte[]> RenderCached(string cachePath, VectorStyle style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
+        public async static Task<byte[]> RenderCached(IVectorCache cache, VectorStyle style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
         {
             string layerString = whiteListLayers == null ? "" : string.Join(",-", whiteListLayers.ToArray());
 
@@ -28,9 +28,9 @@ namespace AliFlex.VectorTileRenderer
 
             lock (cacheLock)
             {
-                if (!Directory.Exists(cachePath))
+                if (!Directory.Exists(cache.CachePath))
                 {
-                    Directory.CreateDirectory(cachePath);
+                    Directory.CreateDirectory(cache.CachePath);
                 }
             }
 
@@ -38,7 +38,7 @@ namespace AliFlex.VectorTileRenderer
             var hash = Utils.Sha256(json).Substring(0, 12); // get 12 digits to avoid fs length issues
 
             var fileName = x + "x" + y + "-" + zoom + "-" + hash + ".png";
-            var path = Path.Combine(cachePath, fileName);
+            var path = Path.Combine(cache.CachePath, fileName);
 
             lock (cacheLock)
             {
@@ -84,8 +84,10 @@ namespace AliFlex.VectorTileRenderer
 
               });
 
-
-
+            lock (cacheLock)
+            {
+                cache.Refresh();
+            }
 
             return bitmap;
         }
