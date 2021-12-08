@@ -1,4 +1,4 @@
 ﻿namespace AliFlex.VectorTileRenderer.Enums
 {
-    public enum VectorStyleKind { Basic, Bright, Dark, Light, Liberty, Custom }
+    public enum VectorStyleKind { Basic, Bright, Dark, Light, Liberty, Toner, Custom }
 }

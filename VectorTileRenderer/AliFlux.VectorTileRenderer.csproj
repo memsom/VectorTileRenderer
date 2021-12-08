@@ -35,6 +35,22 @@
 	  <None Remove="Styles\fonts\NotoSans-Bold.ttf" />
 	  <None Remove="Styles\fonts\NotoSans-Italic.ttf" />
 	  <None Remove="Styles\fonts\NotoSans-Regular.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Black-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Black.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Bold.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Bold.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Light-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Light.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Light-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Light.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Medium-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Medium.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Regular.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Semi-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Semi-Bold.ttf" />
 	  <None Remove="Styles\fonts\OpenSans-Bold-Italic.ttf" />
 	  <None Remove="Styles\fonts\OpenSans-Bold.ttf" />
 	  <None Remove="Styles\fonts\OpenSans-Extra-Bold-Italic.ttf" />
@@ -62,6 +78,7 @@
 	  <None Remove="Styles\light-style.json" />
 	  <None Remove="Styles\runner-style.json" />
 	  <None Remove="Styles\streets-style.json" />
+	  <None Remove="Styles\toner-style.json" />
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="Styles\aliflux-style.json" />
@@ -94,6 +111,22 @@
 	  <EmbeddedResource Include="Styles\fonts\NotoSans-Bold.ttf" />
 	  <EmbeddedResource Include="Styles\fonts\NotoSans-Italic.ttf" />
 	  <EmbeddedResource Include="Styles\fonts\NotoSans-Regular.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Black-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Black.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Light-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Light.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Light-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Light.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Medium-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Medium.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Regular.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Semi-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Semi-Bold.ttf" />
 	  <EmbeddedResource Include="Styles\fonts\OpenSans-Bold-Italic.ttf" />
 	  <EmbeddedResource Include="Styles\fonts\OpenSans-Bold.ttf" />
 	  <EmbeddedResource Include="Styles\fonts\OpenSans-Extra-Bold-Italic.ttf" />
@@ -121,6 +154,7 @@
 	  <EmbeddedResource Include="Styles\light-style.json" />
 	  <EmbeddedResource Include="Styles\runner-style.json" />
 	  <EmbeddedResource Include="Styles\streets-style.json" />
+	  <EmbeddedResource Include="Styles\toner-style.json" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
