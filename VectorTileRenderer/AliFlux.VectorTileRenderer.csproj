@@ -1,0 +1,225 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Configurations>Debug;Release</Configurations>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="Styles\aliflux-style.json" />
+	  <None Remove="Styles\basic-style.json" />
+	  <None Remove="Styles\bright-style.json" />
+	  <None Remove="Styles\dark-style.json" />
+	  <None Remove="Styles\fonts\Metropolis-Black-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Black.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Bold-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Bold.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Extra-Bold-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Extra-Bold.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Extra-Light-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Extra-Light.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Light-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Light.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Medium-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Medium.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Regular-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Regular.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Semi-Bold-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Semi-Bold.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Thin-Italic.otf" />
+	  <None Remove="Styles\fonts\Metropolis-Thin.otf" />
+	  <None Remove="Styles\fonts\Noto-Sans-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Noto-Sans-Bold.ttf" />
+	  <None Remove="Styles\fonts\Noto-Sans-Italic.ttf" />
+	  <None Remove="Styles\fonts\Noto-Sans-Regular.ttf" />
+	  <None Remove="Styles\fonts\NotoSans-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\NotoSans-Bold.ttf" />
+	  <None Remove="Styles\fonts\NotoSans-Italic.ttf" />
+	  <None Remove="Styles\fonts\NotoSans-Regular.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Black-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Black.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Bold.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Bold.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Light-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Extra-Light.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Light-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Light.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Medium-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Medium.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Regular.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Semi-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Nunito-Semi-Bold.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Bold.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Extra-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Extra-Bold.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Italic.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Light-Italic.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Light.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Regular.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Semi-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\OpenSans-Semi-Bold.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Black-Italic.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Black.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Bold-Italic.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Bold.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Italic.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Light-Italic.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Light.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Medium-Italic.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Medium.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Regular.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Thin-Italic.ttf" />
+	  <None Remove="Styles\fonts\Roboto-Thin.ttf" />
+	  <None Remove="Styles\hybrid-style.json" />
+	  <None Remove="Styles\liberty-style.json" />
+	  <None Remove="Styles\light-style.json" />
+	  <None Remove="Styles\runner-style.json" />
+	  <None Remove="Styles\streets-style.json" />
+	  <None Remove="Styles\toner-style.json" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="Styles\aliflux-style.json" />
+	  <EmbeddedResource Include="Styles\basic-style.json" />
+	  <EmbeddedResource Include="Styles\bright-style.json" />
+	  <EmbeddedResource Include="Styles\dark-style.json" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Black-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Black.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Bold-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Bold.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Extra-Bold-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Extra-Bold.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Extra-Light-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Extra-Light.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Light-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Light.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Medium-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Medium.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Regular-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Regular.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Semi-Bold-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Semi-Bold.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Thin-Italic.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Metropolis-Thin.otf" />
+	  <EmbeddedResource Include="Styles\fonts\Noto-Sans-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Noto-Sans-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Noto-Sans-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Noto-Sans-Regular.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\NotoSans-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\NotoSans-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\NotoSans-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\NotoSans-Regular.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Black-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Black.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Light-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Extra-Light.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Light-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Light.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Medium-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Medium.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Regular.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Semi-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Nunito-Semi-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Extra-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Extra-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Light-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Light.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Regular.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Semi-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\OpenSans-Semi-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Black-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Black.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Bold-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Bold.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Light-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Light.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Medium-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Medium.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Regular.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Thin-Italic.ttf" />
+	  <EmbeddedResource Include="Styles\fonts\Roboto-Thin.ttf" />
+	  <EmbeddedResource Include="Styles\hybrid-style.json" />
+	  <EmbeddedResource Include="Styles\liberty-style.json" />
+	  <EmbeddedResource Include="Styles\light-style.json" />
+	  <EmbeddedResource Include="Styles\runner-style.json" />
+	  <EmbeddedResource Include="Styles\streets-style.json" />
+	  <EmbeddedResource Include="Styles\toner-style.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+		<PackageReference Include="Newtonsoft.Json">
+			<Version>13.0.1</Version>
+		</PackageReference>
+		<PackageReference Include="SkiaSharp">
+			<Version>2.80.3</Version>
+		</PackageReference>
+		<PackageReference Include="sqlite-net-pcl" Version="1.7.335" />		
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Mapbox.VectorTiles\ExtensionMethods\Mapbox.VectorTile.ExtensionMethods.csproj" />
+	  <ProjectReference Include="..\Mapbox.VectorTiles\Geometry\Mapbox.VectorTile.Geometry.csproj" />
+	  <ProjectReference Include="..\Mapbox.VectorTiles\PbfReader\Mapbox.VectorTile.PbfReader.csproj" />
+	  <ProjectReference Include="..\Mapbox.VectorTiles\VectorTileReader\Mapbox.VectorTile.VectorTileReader.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Include="Styles\fonts\Metropolis-Black-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Black.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Bold-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Bold.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Extra-Bold-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Extra-Bold.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Extra-Light-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Extra-Light.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Light-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Light.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Medium-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Medium.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Regular-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Regular.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Semi-Bold-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Semi-Bold.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Thin-Italic.otf" />
+	  <Resource Include="Styles\fonts\Metropolis-Thin.otf" />
+	  <Resource Include="Styles\fonts\Noto-Sans-Bold-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Noto-Sans-Bold.ttf" />
+	  <Resource Include="Styles\fonts\Noto-Sans-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Noto-Sans-Regular.ttf" />
+	  <Resource Include="Styles\fonts\NotoSans-Bold-Italic.ttf" />
+	  <Resource Include="Styles\fonts\NotoSans-Bold.ttf" />
+	  <Resource Include="Styles\fonts\NotoSans-Italic.ttf" />
+	  <Resource Include="Styles\fonts\NotoSans-Regular.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Bold-Italic.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Bold.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Extra-Bold-Italic.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Extra-Bold.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Italic.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Light-Italic.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Light.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Regular.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Semi-Bold-Italic.ttf" />
+	  <Resource Include="Styles\fonts\OpenSans-Semi-Bold.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Black-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Black.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Bold-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Bold.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Light-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Light.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Medium-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Medium.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Regular.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Thin-Italic.ttf" />
+	  <Resource Include="Styles\fonts\Roboto-Thin.ttf" />
+	</ItemGroup>
+</Project>

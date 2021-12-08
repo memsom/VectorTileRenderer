@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     static class Utils
     {

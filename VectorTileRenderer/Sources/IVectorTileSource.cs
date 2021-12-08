@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace VectorTileRenderer.Sources
+namespace AliFlex.VectorTileRenderer.Sources
 {
     public interface IVectorTileSource : ITileSource
     {

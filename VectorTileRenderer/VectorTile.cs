@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     public class VectorTile
     {
         public bool IsOverZoomed { get; set; } = false;
         public List<VectorTileLayer> Layers = new List<VectorTileLayer>();
 
-        public VectorTile ApplyExtent(VTRect extent)
+        public VectorTile ApplyExtent(Rect extent)
         {
             var newTile = new VectorTile
             {
@@ -31,17 +32,17 @@ namespace VectorTileRenderer
                         GeometryType = feature.GeometryType
                     };
 
-                    var vectorGeometry = new List<List<VTPoint>>();
+                    var vectorGeometry = new List<List<Point>>();
                     foreach (var geometry in feature.Geometry)
                     {
-                        var vectorPoints = new List<VTPoint>();
+                        var vectorPoints = new List<Point>();
 
                         foreach (var point in geometry)
                         {
                             var newX = Utils.ConvertRange(point.X, extent.Left, extent.Right, 0, vectorFeature.Extent);
                             var newY = Utils.ConvertRange(point.Y, extent.Top, extent.Bottom, 0, vectorFeature.Extent);
 
-                            vectorPoints.Add(new VTPoint(newX, newY));
+                            vectorPoints.Add(new Point(newX, newY));
                         }
 
                         vectorGeometry.Add(vectorPoints);

@@ -1,12 +1,14 @@
-﻿using System;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using AliFlex.VectorTileRenderer.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     static class LineClipper
     {
-        static OutCode ComputeOutCode(double x, double y, VTRect r)
+        static OutCode ComputeOutCode(double x, double y, Rect r)
         {
             var code = OutCode.Inside;
 
@@ -18,9 +20,9 @@ namespace VectorTileRenderer
             return code;
         }
 
-        static OutCode ComputeOutCode(VTPoint p, VTRect r) { return ComputeOutCode(p.X, p.Y, r); }
+        static OutCode ComputeOutCode(Point p, Rect r) { return ComputeOutCode(p.X, p.Y, r); }
 
-        static VTPoint CalculateIntersection(VTRect r, VTPoint p1, VTPoint p2, OutCode clipTo)
+        static Point CalculateIntersection(Rect r, Point p1, Point p2, OutCode clipTo)
         {
             var dx = (p2.X - p1.X);
             var dy = (p2.Y - p1.Y);
@@ -30,28 +32,28 @@ namespace VectorTileRenderer
 
             if (clipTo.HasFlag(OutCode.Top))
             {
-                return new VTPoint(
+                return new Point(
                     p1.X + slopeY * (r.Top - p1.Y),
                     r.Top
                     );
             }
             if (clipTo.HasFlag(OutCode.Bottom))
             {
-                return new VTPoint(
+                return new Point(
                     p1.X + slopeY * (r.Bottom - p1.Y),
                     r.Bottom
                     );
             }
             if (clipTo.HasFlag(OutCode.Right))
             {
-                return new VTPoint(
+                return new Point(
                     r.Right,
                     p1.Y + slopeX * (r.Right - p1.X)
                     );
             }
             if (clipTo.HasFlag(OutCode.Left))
             {
-                return new VTPoint(
+                return new Point(
                     r.Left,
                     p1.Y + slopeX * (r.Left - p1.X)
                     );
@@ -59,7 +61,7 @@ namespace VectorTileRenderer
             throw new ArgumentOutOfRangeException("clipTo = " + clipTo);
         }
 
-        public static Tuple<VTPoint, VTPoint> ClipSegment(VTRect r, VTPoint p1, VTPoint p2)
+        public static Tuple<Point, Point> ClipSegment(Rect r, Point p1, Point p2)
         {
             // classify the endpoints of the line
             var outCodeP1 = ComputeOutCode(p1, r);
@@ -107,14 +109,14 @@ namespace VectorTileRenderer
             // if clipping area contained a portion of the line
             if (accept)
             {
-                return new Tuple<VTPoint, VTPoint>(p1, p2);
+                return new Tuple<Point, Point>(p1, p2);
             }
 
             // the line did not intersect the clipping area
             return null;
         }
 
-        static VTRect getLineRect(List<VTPoint> polyLine)
+        static Rect getLineRect(List<Point> polyLine)
         {
             double minX = double.MaxValue;
             double minY = double.MaxValue;
@@ -142,10 +144,10 @@ namespace VectorTileRenderer
                 }
             }
 
-            return new VTRect(minX, minY, maxX - minX, maxY - minY);
+            return new Rect(minX, minY, maxX - minX, maxY - minY);
         }
 
-        public static List<VTPoint> ClipPolyline(List<VTPoint> polyLine, VTRect bounds)
+        public static List<Point> ClipPolyline(List<Point> polyLine, Rect bounds)
         {
             var lineRect = getLineRect(polyLine);
 
@@ -154,7 +156,7 @@ namespace VectorTileRenderer
                 return null;
             }
 
-            List<VTPoint> newLine = null;
+            List<Point> newLine = null;
 
             for (int i = 1; i < polyLine.Count; i++)
             {
@@ -167,7 +169,7 @@ namespace VectorTileRenderer
                 {
                     if(newLine == null)
                     {
-                        newLine = new List<VTPoint>();
+                        newLine = new List<Point>();
                         newLine.Add(newSegment.Item1);
                         newLine.Add(newSegment.Item2);
                     }

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using AliFlex.VectorTileRenderer.Drawing;
+using System.Collections.Generic;
 
-namespace VectorTileRenderer
+namespace AliFlex.VectorTileRenderer
 {
     public class VectorTileFeature
     {
@@ -9,6 +10,6 @@ namespace VectorTileRenderer
 
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
-        public List<List<VTPoint>> Geometry = new List<List<VTPoint>>();
+        public List<List<Point>> Geometry = new List<List<Point>>();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using SQLite;
 
-namespace VectorTileRenderer.Sources
+namespace AliFlex.VectorTileRenderer.Sources.Tables
 {
     [Table("metadata")]
     public class MetaData

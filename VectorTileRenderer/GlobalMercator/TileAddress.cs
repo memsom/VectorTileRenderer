@@ -1,4 +1,4 @@
-﻿namespace VectorTileRenderer
+﻿namespace AliFlex.VectorTileRenderer.GlobalMercator
 {
     public class TileAddress
     {

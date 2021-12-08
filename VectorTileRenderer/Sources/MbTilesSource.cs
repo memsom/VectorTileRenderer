@@ -1,10 +1,14 @@
-﻿using SQLite;
+﻿using AliFlex.VectorTileRenderer;
+using AliFlex.VectorTileRenderer.Drawing;
+using AliFlex.VectorTileRenderer.GlobalMercator;
+using AliFlex.VectorTileRenderer.Sources.Tables;
+using SQLite;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace VectorTileRenderer.Sources
+namespace AliFlex.VectorTileRenderer.Sources
 {
     // MbTiles loading code in GIST by geobabbler
     // https://gist.github.com/geobabbler/9213392
@@ -22,11 +26,10 @@ namespace VectorTileRenderer.Sources
 
         ConcurrentDictionary<string, VectorTile> tileCache = new ConcurrentDictionary<string, VectorTile>();
 
-        readonly GlobalMercator gmt = new GlobalMercator();
-
+        readonly GlobalMercatorImplementation gmt = new GlobalMercatorImplementation();
         readonly SQLiteConnection sharedConnection;
 
-
+        // converted to use Sqlite-Net
         public MbTilesSource(string path)
         {
             this.Path = path;
@@ -42,7 +45,6 @@ namespace VectorTileRenderer.Sources
         {
             try
             {
-
                 foreach (var item in sharedConnection.Table<MetaData>())
                 {
                     string name = item.Name;
@@ -88,12 +90,13 @@ namespace VectorTileRenderer.Sources
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new MemberAccessException("Could not load Mbtiles source file");
             }
         }
 
+        // converted to use Sqlite-Net
         public Stream GetRawTile(int x, int y, int zoom)
         {
             try
@@ -130,7 +133,7 @@ namespace VectorTileRenderer.Sources
 
         public async Task<VectorTile> GetVectorTile(int x, int y, int zoom)
         {
-            var extent = new VTRect(0, 0, 1, 1);
+            var extent = new Rect(0, 0, 1, 1);
             bool overZoomed = false;
 
             if (zoom > MaxZoom)
@@ -177,7 +180,7 @@ namespace VectorTileRenderer.Sources
                 var newR = Utils.ConvertRange(southEast.X, biggerBounds.West, biggerBounds.East, 0, 1);
                 var newB = Utils.ConvertRange(southEast.Y, biggerBounds.North, biggerBounds.South, 0, 1);
 
-                extent = new VTRect(new VTPoint(newL, newT), new VTPoint(newR, newB));
+                extent = new Rect(new Point(newL, newT), new Point(newR, newB));
                 //thisZoom = MaxZoom;
 
                 x = biggerTile.X;
@@ -202,6 +205,7 @@ namespace VectorTileRenderer.Sources
             }
             catch (Exception e)
             {
+                System.Diagnostics.Debug.WriteLine(e.Message);
                 return null;
             }
         }
@@ -228,7 +232,6 @@ namespace VectorTileRenderer.Sources
                         return tile;
                     }
                 }
-
             });
         }
 

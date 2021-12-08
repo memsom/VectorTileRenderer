@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:xaml="clr-namespace:Mapsui.UI.Forms;assembly=Mapsui.UI.Forms"
+             x:Class="TileTest.MainPage">
+
+    <Grid RowDefinitions="10*,90*">
+        <Grid Grid.Row="0" VerticalOptions="Start" Background="sc#0.3,1,1,1">
+            <Picker VerticalOptions="Start" HorizontalOptions="End" WidthRequest="206" Margin="40,10,40,0" SelectedIndex="0" x:Name="styleBox" SelectedIndexChanged="styleBox_SelectedIndexChanged" />
+        </Grid>
+
+        <xaml:MapControl Grid.Row="1" x:Name="MyMapControl"></xaml:MapControl>
+    </Grid>
+
+</ContentPage>

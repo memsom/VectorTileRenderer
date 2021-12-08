@@ -1,25 +1,28 @@
 ﻿using BruTile;
 using System;
-using VectorTileRenderer;
+using AliFlex.VectorTileRenderer;
+using AliFlex.VectorTileRenderer.Sources;
+using AliFlex.VectorTileRenderer.Enums;
 
 namespace Mapsui.Demo.WPF
 {
     class VectorMbTilesProvider : ITileProvider
     {
 
-        Style style;
-        VectorTileRenderer.Sources.MbTilesSource provider;
+        VectorStyle style;
+        MbTilesSource provider;
         string cachePath;
 
-        public VectorMbTilesProvider(string path, string stylePath, string cachePath)
+        public VectorMbTilesProvider(string path, string cachePath, VectorStyleKind kind, string customStyle = default)
         {
             this.cachePath = cachePath;
-            style = new Style(stylePath);
-            style.FontDirectory = @"styles/fonts/";
+            style = new VectorStyle(kind)
+            {
+                CustomStyle = customStyle
+            };
 
-            provider = new VectorTileRenderer.Sources.MbTilesSource(path);
+            provider = new MbTilesSource(path);
             style.SetSourceProvider("openmaptiles", provider);
-
         }
         
         public byte[] GetTile(TileInfo tileInfo)
