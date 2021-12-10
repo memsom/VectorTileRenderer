@@ -22,7 +22,7 @@ namespace Mapsui.Demo.WPF
             styleBox.ItemsSource = items;
             styleBox.SelectedIndex = 0;
 
-            var point = new Point(8.542693, 47.368659);
+            var point = new Point(8.542693, 47.368659); // zurich
             var sphericalPoint = SphericalMercator.FromLonLat(point.X, point.Y);
 
             MyMapControl.Navigator.NavigateTo(sphericalPoint, 12.0);

@@ -109,17 +109,21 @@ namespace AliFlex.VectorTileRenderer.Sources
                 {
                     Mapbox.VectorTile.VectorTileLayer lyr = tile.GetLayer(lyrName);
 
-                    var vectorLayer = new VectorTileLayer();
-                    vectorLayer.Name = lyrName;
+                    var vectorLayer = new VectorTileLayer
+                    {
+                        Name = lyrName
+                    };
 
                     for (int i = 0; i < lyr.FeatureCount(); i++)
                     {
                         Mapbox.VectorTile.VectorTileFeature feat = lyr.GetFeature(i);
 
-                        var vectorFeature = new VectorTileFeature();
-                        vectorFeature.Extent = 1;
-                        vectorFeature.GeometryType = ConvertGeometryType(feat.GeometryType);
-                        vectorFeature.Attributes = feat.GetProperties();
+                        var vectorFeature = new VectorTileFeature
+                        {
+                            Extent = 1,
+                            GeometryType = ConvertGeometryType(feat.GeometryType),
+                            Attributes = feat.GetProperties()
+                        };
 
                         var vectorGeometry = new List<List<Point>>();
 
