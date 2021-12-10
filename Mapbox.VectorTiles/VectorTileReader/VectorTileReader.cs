@@ -11,10 +11,6 @@ using System.Linq;
 
 namespace Mapbox.VectorTile
 {
-
-
-
-
 	/// <summary>
 	/// Mail vector tile reader class
 	/// </summary>
