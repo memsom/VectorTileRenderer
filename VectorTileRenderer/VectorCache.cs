@@ -9,6 +9,14 @@ namespace AliFlex.VectorTileRenderer
         DirectoryInfo directoryInfo = default;
         FileInfo[] files = default;
 
+
+        public SimpleVectorCache(string path)
+        {
+            CachePath = path;
+
+            Refresh();
+        }
+
         public int Count
         {
             get
@@ -56,13 +64,6 @@ namespace AliFlex.VectorTileRenderer
                     }
                 }
             }
-        }
-
-        public VectorCache(string path)
-        {
-            CachePath = path;
-
-            Refresh();
         }
     }
 }
