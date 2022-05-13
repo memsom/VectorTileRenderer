@@ -2,6 +2,8 @@
 
 ## A comprehensive Vector Map Tile Renderer for .Net/C#
 
+This version of the renderer is cleaned up a lot over the original repo. I have rewritten and revised the code to work under Xamarin Forms.
+
 <p align="center">
   <img src="images/zurich.png">
 </p>
@@ -22,6 +24,7 @@ The library is packed with almost all the components for building a successful m
 - Compatable with [mapbox/openmaptiles vector tile specification](https://www.mapbox.com/vector-tiles/specification/)
 - Supports [mapbox style specification](https://www.mapbox.com/mapbox-gl-js/style-spec/)
 - Stress free MIT License
+- _[NEW]_ Supports Xamarin Forms
 
 ![](images/zurich-basic.png) ![](images/zurich-bright.png) ![](images/zurich-light.png)
 
